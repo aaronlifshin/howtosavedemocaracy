@@ -283,6 +283,10 @@ class AuthHandler(WhysaurusRequestHandler, SimpleAuthHandler):
             # user.put()
             self.auth.set_session(self.auth.store.user_to_dict(user))
             self.current_user = user
+<<<<<<< HEAD
+=======
+            user.login()
+>>>>>>> 3ffa1078d80101291b29c792760ecbd182757f26
             if user.privateArea and user.privateArea is not None:
                 self.setUserArea(usePrivate=True)
         else:
@@ -291,6 +295,8 @@ class AuthHandler(WhysaurusRequestHandler, SimpleAuthHandler):
             # otherwise add this auth_id to currently logged in user.
 
             if self.logged_in and self.current_user:
+                # This code is currently not triggered, 
+                # there is no way to log in again once logged in
                 logging.info('Updating currently logged in user')
 
                 u = self.current_user
@@ -300,6 +306,7 @@ class AuthHandler(WhysaurusRequestHandler, SimpleAuthHandler):
                 # (boolean, info) tuple where boolean == True indicates success
                 # See webapp2_extras.appengine.auth.models.User for details.
                 u.add_auth_id(auth_id)
+                u.login()
 
 
             else:
@@ -307,6 +314,7 @@ class AuthHandler(WhysaurusRequestHandler, SimpleAuthHandler):
                 _attrs['url'] = WhysaurusUser.constructURL(_attrs['name'])
                 ok, user = self.auth.store.user_model.create_user(auth_id, **_attrs)
                 if ok:
+                    user.login()
                     self.auth.set_session(self.auth.store.user_to_dict(user))
                     self.redirect("/")
                 else:

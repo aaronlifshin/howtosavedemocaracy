@@ -55,7 +55,11 @@ function callPointEdit(){
 				var ed = tinyMCE.get('editor_pointDialog');
 			    obj = JSON.parse(data);
 				$('.mainPointContent').html(ed.getContent());
+<<<<<<< HEAD
 				$('.mainPointTitle').html($('#title_pointDialog').val());
+=======
+				$('.mainPointTitle h1').html($('#title_pointDialog').val());
+>>>>>>> 3ffa1078d80101291b29c792760ecbd182757f26
 				$('.mainPointLastEdited').html('Last edited ' + obj.dateEdited + 
 				    ' by <a href=\'/user/' + obj.authorURL +'\'>'+ obj.author + '</a>');
                 if (obj.imageURL) {
@@ -292,9 +296,14 @@ function make_this_show_login_dlg(button) {
 
 function populateEditFields() {
   var ed = tinyMCE.get('editor_pointDialog');
+<<<<<<< HEAD
   var nodetype = $('#pointSummary').data('nodetype')
   
   $('div.modal-header h3', $('#pointDialog')).text("Edit " + nodetype);
+=======
+
+  $('div.modal-header h3', $('#pointDialog')).text("Edit Point");
+>>>>>>> 3ffa1078d80101291b29c792760ecbd182757f26
 
   $('#title_pointDialog').val($('#pointSummary div.mainPointTitle').text());
   setCharNumText($('#title_pointDialog')[0]);

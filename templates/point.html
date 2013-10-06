@@ -90,8 +90,13 @@
                   {% endif %}                    
               </div>                                
             </div>
+<<<<<<< HEAD
             <div id="pointSummary" data-nodetype='{{point.nodetype}}' class="span7">
                       <h1 class="condensed">{{point.nodetype}}<div class="mainPointTitle editable">{{ point.title|escape }}</div></h1>
+=======
+            <div id="pointSummary" class="span7">
+                      <div class="mainPointTitle editable"><h1 class="condensed">{{ point.title|escape }}</h1></div>
+>>>>>>> 3ffa1078d80101291b29c792760ecbd182757f26
       				<div class="mainPointContent editable">{{ point.content|safe }}</div>
                       <!-- Hacky way to get imageurl into the edit dialog. :/ -->
                       <div class="mainPointImageURL" style="display: none">{{point.imageURL}}</div>
@@ -122,10 +127,17 @@
                 </button>
               </div>
            </div>     
+<<<<<<< HEAD
       	  <div class="row-fluid grayBackground" id="pointControlRow">
   			<div class="span8">
   			    <button class="mainPointButton tab selectedTab" id="viewSupportingPoints">
   					Pros and Cons
+=======
+      	  <div class="row-fluid grayBackground">
+  			<div class="span8">
+  			    <button class="mainPointButton tab selectedTab" id="viewSupportingPoints">
+  					Connections
+>>>>>>> 3ffa1078d80101291b29c792760ecbd182757f26
   				</button>
   			    <!-- <button class="mainPointButton tab" id="viewComments">
   					{{comments|length}} comments
@@ -190,7 +202,11 @@
         </div> <!-- id="supportingPointsArea" class="tabbedArea"-->
 
 
+<<<<<<< HEAD
       <div id="historyArea" class="row-fluid tabbedArea"> </div>
+=======
+      <div id="historyArea" class="row tabbedArea"> </div>
+>>>>>>> 3ffa1078d80101291b29c792760ecbd182757f26
   </div>
   
   

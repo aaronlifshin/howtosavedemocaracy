@@ -19,12 +19,15 @@ class GetPointsList(AuthHandler):
             points = PointRoot.getTopRatedPoints()
         elif listType == 'editorsPics':
             points = PointRoot.getEditorsPicks()
+<<<<<<< HEAD
         elif listType == 'topProjects':
             points = PointRoot.getTopRatedNodetype('Project')
         elif listType == 'topObjectives':
             points = PointRoot.getTopRatedNodetype('Objective')
         elif listType == 'topOrganizations':
             points = PointRoot.getTopRatedNodetype('Organization')
+=======
+>>>>>>> 3ffa1078d80101291b29c792760ecbd182757f26
 
         template_values = {
             'points':points

@@ -213,7 +213,11 @@ class Point(ndb.Model):
         return point, pointRoot
 
     @staticmethod
+<<<<<<< HEAD
     def create(title, nodetype, content, summaryText, user, backlink=None, linktype="",
+=======
+    def create(title, content, summaryText, user, backlink=None, linktype="",
+>>>>>>> 3ffa1078d80101291b29c792760ecbd182757f26
                imageURL=None, imageAuthor=None, imageDescription=None, 
                sourceURLs=None, sourceNames=None):
         newUrl = makeURL(title)
@@ -230,7 +234,11 @@ class Point(ndb.Model):
                 pointRoot.pointsCounterredByMe = [backlink]
                 
         createdPoint, createdPointRoot = Point.transactionalCreate(
+<<<<<<< HEAD
                             pointRoot, title, nodetype, content, summaryText, user,
+=======
+                            pointRoot,title, content, summaryText, user,
+>>>>>>> 3ffa1078d80101291b29c792760ecbd182757f26
                             imageURL, imageAuthor, imageDescription, 
                             sourceURLs, sourceNames )
         Follow.createFollow(user.key, createdPointRoot.key, "created")
@@ -810,6 +818,7 @@ class PointRoot(ndb.Model):
         pointsQuery = Point.gql(
             "WHERE current = TRUE ORDER BY dateEdited DESC")
         return pointsQuery.fetch(50)
+<<<<<<< HEAD
 
     @staticmethod
     def getTopRatedNodetype(nodetype, filterList = None):
@@ -821,6 +830,8 @@ class PointRoot(ndb.Model):
                 if not point in filterList:
                     topPoints = topPoints + [point]
         return topPoints
+=======
+>>>>>>> 3ffa1078d80101291b29c792760ecbd182757f26
 
     @staticmethod
     def getTopRatedPoints(filterList = None):
@@ -884,7 +895,11 @@ class PointRoot(ndb.Model):
             point.key.delete()
             
         for comment in self.comments:
+<<<<<<< HEAD
             comment.delete()
+=======
+            comment.key.delete()
+>>>>>>> 3ffa1078d80101291b29c792760ecbd182757f26
 
         # TODO: Find the user that created and edited this, and delete REFS
 

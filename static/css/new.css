@@ -324,10 +324,13 @@ body {
     border-bottom: 1px solid #B9BBBD;	
 }
 
+<<<<<<< HEAD
 /* +++++++++++++++++++++++++++++++++++++++++++++++
    END NOTIFICATION AREA IN PROFILE PAGE
    +++++++++++++++++++++++++++++++++++++++++++++++ */
 
+=======
+>>>>>>> 3ffa1078d80101291b29c792760ecbd182757f26
 .pointCard {
 	border-style:solid;
 	border-width:1px;
@@ -377,6 +380,7 @@ body {
     padding-top:3px;    
 }
 
+<<<<<<< HEAD
 .label-Project {
     background-color: #428BCA;
 }
@@ -398,6 +402,15 @@ body {
 	background-color: #ffe6e7;
 }
 
+=======
+.text-right {
+    text-align:right;	
+}
+.pointCard .counterColor {
+	background-color: #ffe6e7;
+}
+
+>>>>>>> 3ffa1078d80101291b29c792760ecbd182757f26
 .pointCard .supportColor {
     background-color: #e3fde5;
 }
@@ -606,6 +619,7 @@ body {
     -moz-box-shadow:    -1px 1px 10px rgba(50, 50, 50, 0.75);
     box-shadow:         -1px 1px 10px rgba(50, 50, 50, 0.75);
     /* background-position:-60px center; */
+<<<<<<< HEAD
 }
 
 .upTreeMenus {
@@ -620,6 +634,22 @@ body {
     border-radius: 2px;
 }
 
+=======
+}
+
+.upTreeMenus {
+	font-family: "ff-meta-web-pro-condensed";
+    font-weight: 700;
+    text-transform: uppercase;
+    font-size: .9em;
+    color: #707070;
+    background:none;
+    background-color:#FFFFFF;
+    border: 1px solid;
+    border-radius: 2px;
+}
+
+>>>>>>> 3ffa1078d80101291b29c792760ecbd182757f26
 .upTreeMenus:hover {
     background-color:#E0FFFE;	
 }
@@ -645,6 +675,7 @@ body {
 
 .redVote, .redVote a {
 	color:#FF000B;
+<<<<<<< HEAD
 }
 
 .greenVote, .greenVote a {
@@ -653,6 +684,12 @@ body {
 
 .prosCons {
     padding-top:10px;
+=======
+}
+
+.greenVote, .greenVote a {
+	color:#0CCF00;
+>>>>>>> 3ffa1078d80101291b29c792760ecbd182757f26
 }
 
 #supporting_nonzeroPoints, #counter_nonzeroPoints  {
@@ -1255,6 +1292,7 @@ fieldset { padding:0; border:0; margin-top:25px;}
 .outlinerInput.level4 {
     margin-left: 20%;
     width:80%;  
+<<<<<<< HEAD
 }
 
 .outlinerInput.level5 {
@@ -1268,6 +1306,21 @@ fieldset { padding:0; border:0; margin-top:25px;}
     background-color: #E0FFFE;
 }
 
+=======
+}
+
+.outlinerInput.level5 {
+    margin-left: 25%;
+    width:75%;  
+}
+
+#outliner_details {
+	margin-left:0px;
+	width:40,83%;
+    background-color: #E0FFFE;
+}
+
+>>>>>>> 3ffa1078d80101291b29c792760ecbd182757f26
 #outliner_details input {
 	width: 96.5%;
 }
