@@ -1,4 +1,4 @@
-application: whysaurus
+application: howtosavedemocracy
 version: 1
 runtime: python27
 api_version: 1
@@ -8,9 +8,6 @@ builtins:
 - remote_api: on
 
 handlers:
-- url: /favicon\.ico
-  static_files: static/img/triceratops_icon.png
-  upload: static/img/triceratops_icon.png
 
 - url: /static
   static_dir: static

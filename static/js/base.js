@@ -1,10 +1,44 @@
 var CONST_EDITOR_DEFAULT_TEXT = 'Add the description here...';
 var MAX_TITLE_CHARS = 140;
 
+function showAlert(alertHTML) {
+    $('#mainContainer').prepend($('<div class="alert"><button type="button" class="close" data-dismiss="alert">&times;</button>' + alertHTML + '</div>'));
+}
+
+function showAlertAfter(alertText, elementSelector) {
+        $(elementSelector).after($('<div class="alert"><button type="button" class="close" data-dismiss="alert">&times;</button>' + alertText + '</div>'));
+}
+
+function showErrorAlert(alertHTML) {
+    $('#mainContainer').prepend($('<div class="alert alert-error"><button type="button" class="close" data-dismiss="alert">&times;</button>' + alertHTML + '</div>'));
+}
+
+function showSuccessAlert(alertText) {
+    $('#mainContainer').prepend($('<div class="alert alert-success"><button type="button" class="close" data-dismiss="alert">&times;</button>' + alertText + '</div>'));
+}
+
 function validateURL(textval) {
-     var urlregex = new RegExp(
-           "^(http|https|ftp)\://([a-zA-Z0-9\.\-]+(\:[a-zA-Z0-9\.&amp;%\$\-]+)*@)*((25[0-5]|2[0-4][0-9]|[0-1]{1}[0-9]{2}|[1-9]{1}[0-9]{1}|[1-9])\.(25[0-5]|2[0-4][0-9]|[0-1]{1}[0-9]{2}|[1-9]{1}[0-9]{1}|[1-9]|0)\.(25[0-5]|2[0-4][0-9]|[0-1]{1}[0-9]{2}|[1-9]{1}[0-9]{1}|[1-9]|0)\.(25[0-5]|2[0-4][0-9]|[0-1]{1}[0-9]{2}|[1-9]{1}[0-9]{1}|[0-9])|([a-zA-Z0-9\-]+\.)*[a-zA-Z0-9\-]+\.(com|edu|gov|int|mil|net|org|biz|arpa|info|name|pro|aero|coop|museum|[a-zA-Z]{2}))(\:[0-9]+)*(/($|[a-zA-Z0-9\.\,\?\'\\\+&amp;%\$#\=~_\-]+))*$");
-     return urlregex.test(textval);
+     return textval.match(/^(ht|f)tps?:\/\/[a-z0-9-\.]+\.[a-z]{2,4}\/?([^\s<>\#%"\,\{\}\\|\\\^\[\]`]+)?$/);
+}
+
+function validateEmail(textval) {
+     return textval.match(/^[A-Z0-9._%-]+@[A-Z0-9.-]+\.[A-Z]{2,4}$/i);
+}
+
+function validatePassword(textval) {
+     return textval.match(/[A-Za-z]/) && textval.match(/[0-9]/);
+}
+   
+function startSpinnerOnButton(buttonID) {
+   $(buttonID).off('click');
+   $(buttonID).hide();
+   $(buttonID).after("<img id=\"spinnerImage\" src=\"/static/img/ajax-loader.gif\"/>");
+}
+
+function stopSpinnerOnButton(buttonID, clickHandler) {
+   $("#spinnerImage").remove();
+   $(buttonID).click( clickHandler );        
+   $(buttonID).show();
 }
    
 function post_to_url(path, params, method) {
@@ -47,6 +81,35 @@ function getWindowHeight() {
   return height;
 }
 
+function getCaretPosition (oField) {
+
+    // Initialize
+    var iCaretPos = 0;
+
+    // IE Support
+    if (document.selection) {
+
+      // Set focus on the element
+      oField.focus ();
+
+      // To get cursor position, get empty selection range
+      var oSel = document.selection.createRange ();
+
+      // Move selection start to 0 position
+      oSel.moveStart ('character', -oField.value.length);
+
+      // The caret position is selection length
+      iCaretPos = oSel.text.length;
+    }
+
+    // Firefox support
+    else if (oField.selectionStart || oField.selectionStart == '0')
+      iCaretPos = oField.selectionStart;
+
+    // Return results
+    return (iCaretPos);
+}
+
 
 function positionEditDialog() {
   dialogHeight = $(".pointDialog").height();
@@ -77,9 +140,9 @@ function getNewSourcesNames() {
     return sources;
 }
 
-function newPoint() {
+function newPoint(nodeType) {
   if ($('#title_pointDialog').val().length > MAX_TITLE_CHARS) {
-      editDialogAlert('Too many characters in the title');
+      editDialogAlert('Please do not exceed 140 characters for the title.');
       return;
   }
   if ($('#title_pointDialog').val().length == "") {
@@ -101,6 +164,7 @@ function newPoint() {
     data: {
       'content': ed.getContent(),
       'plainText': text.substring(0, 250),
+      'nodetype': nodeType,
       'title': $('#title_pointDialog').val(),
       'imageURL': $('#link_pointDialog').val(),
       'imageAuthor': $('#author_pointDialog').val(),
@@ -120,7 +184,7 @@ function newPoint() {
       }
     },
     error: function(xhr, textStatus, error){
-        editDialogAlert('The server returned an error. You may try again.');
+        editDialogAlert('The server returned an error: ' + xhr + '. You may try again.');
     	stopSpinner();
     }
   });
@@ -190,8 +254,12 @@ function setCharNumText(titleField) {
     }
 }
 
+function dialogAlert(dialogID, alertHTML) {
+    $(dialogID + ' #alertArea').prepend($('<div class="alert"><button type="button" class="close" data-dismiss="alert">&times;</button>' + alertHTML + '</div>'));  
+}
+
 function editDialogAlert(alertHTML) {
-    $('#pointDialog #alertArea').html($('<div class="alert"><button type="button" class="close" data-dismiss="alert">&times;</button>' + alertHTML + '</div>'));
+    dialogAlert('#pointDialog', alertHTML);
 }
 
 function stopSpinner() {
@@ -204,13 +272,14 @@ function stopSpinner() {
 // Oh god I'm sorry
 function submitPointDialog(clickedElement) {
     var dialogAction = $(clickedElement).data('dialogaction');
+    var nodeType = $(clickedElement).data('nodetype');
     if (dialogAction == "new") {
-        newPoint();
+        newPoint(nodeType);
     } else if (dialogAction == "edit") {
         callPointEdit();
     } else if (dialogAction == "createLinked") {
         var linkType = $(clickedElement).data('linktype');
-        addPoint(linkType);
+        addPoint(linkType, nodeType);
     }
 }
 
@@ -225,7 +294,16 @@ function removeSource(clickedElement) {
         $('#pointDialog').data('sourcesToRemove', sourcesToRemove);
     }
     
-    $(clickedElement).parent().remove();
+    $(clickedElement).parent().remove();    
+}
+
+function updateDialogHeight() {
+    numSources = $("[name='source_pointDialog']").length;
+    if (numSources > 1) {
+        $(".pointDialog").height(590 + (numSources-1)*20);        
+    } else {
+        $(".pointDialog").height(590);
+    }
     
 }
 
@@ -249,17 +327,407 @@ function addSourceHTML(sourceURL, sourceTitle, sourceKey) {
     
     appendAfter = $('#sourcesArea');
       
-    newDiv = jQuery('<div/>',{class:"row", name:"source_pointDialog"} );
+    newDiv = jQuery('<div/>',{ name:"source_pointDialog"} );
+    newDiv.addClass("row-fluid");
     if (sourceKey != "") {
         newDiv.data('sourcekey', sourceKey);
     }
-    newDiv.html("<a class=\"span2 removeSource\" href=\"#\">x</a>" + 
-        "<a class=\"span10 sourceLink\" href=\"" +  sourceURL+"\">"+ sourceTitle + "</a>");
+    newDiv.html("<a class=\"span2 offset1 removeSource\" href=\"#\">x</a>" + 
+        "<a class=\"span9 sourceLink\" target=\"_blank\" href=\"" +  sourceURL+"\">"+ sourceTitle + "</a>");
     appendAfter.append(newDiv);        
+    updateDialogHeight();
     $('.removeSource',newDiv).on('click', function(e) {removeSource(this);});
 }
 
+function toggleTabbedArea(selectedTab, tabbedAreaToShow) {
+	$('.tab').removeClass('selectedTab');
+	$(selectedTab).addClass('selectedTab');
+	$('.tabbedArea').hide();
+	$(tabbedAreaToShow).show();
+}
+
+function makePointsCardsClickable() {
+    $( ".pointCard" ).click( function() {
+        window.location.href=$(".pointTitle a", $(this)).attr('href');
+    });
+}
+
+function loadPointList(listType, areaToLoad, selectedTab) {
+    $(areaToLoad).html('<div id="historyAreaLoadingSpinner"><img src="/static/img/ajax-loader.gif" /></div>');
+    toggleTabbedArea(selectedTab, areaToLoad);
+    $.ajax({
+    	url: '/getPointsList',
+    	type: 'POST',
+    	data: { 'type': listType },
+    	success: function(data) {
+    		$(areaToLoad).empty();
+    		$(areaToLoad).html($.parseJSON(data));
+    		makePointsCardsClickable();
+    	},
+    	error: function(data) {
+    		$(areaToLoad).empty();
+    		showAlert('<strong>Oops!</strong> There was a problem loading the points.  Please try again later.');
+    	},
+    }); 
+}
+
+function getSearchResults(searchTerms) {
+  	$.ajaxSetup({
+		url: "/search",
+		global: false,
+		type: "POST",
+		data: {
+			'searchTerms': searchTerms,		
+		},
+		success: function(data) {
+            obj = JSON.parse(data);
+		    if (obj.result == 0) {
+		        showAlert("No results found for: <strong>" + obj.searchString + "</strong>");
+		    } else {
+		        $("#mainContainer").children().remove();
+		        $("#mainContainer").append(obj.html);
+		        makePointsCardsClickable();	                
+		    }
+		},
+	});
+	$.ajax();
+}
+
+function clearSignupDialog() {
+    $("#signup_userName").val("");    
+    $("#signup_userWebsite").val("");
+    $("#signup_userAreas").val("");
+    $("#signup_userProfession").val("");
+    $("#signup_userBio").val("");
+    $("#signup_userEmail").val("");    
+    $("#signup_password1").val("");    
+    $("#signup_password2").val("");   
+    $(".alert").remove();
+}
+
+function validateSignupDialog() {
+    valid = true;
+    userName = $("#signup_userName").val();    
+    websiteVal = $("#signup_userWebsite").val();
+    areasVal = $("#signup_userAreas").val();
+    professionVal = $("#signup_userProfession").val();
+    bioVal = $("#signup_userBio").val();
+    email = $("#signup_userEmail").val();    
+    password1 = $("#signup_password1").val();    
+    password2 = $("#signup_password2").val();    
+    
+    if (password1 != password2) {
+        dialogAlert('#signupDialog','Oops. Your passwords do not match.');
+        valid = false;
+    } else if (password1.length < 8) {
+        dialogAlert('#signupDialog','Please make your password 8 or more characters in length.');
+        valid = false;
+    } else if (!validatePassword(password1)) {
+        dialogAlert('#signupDialog','Please include  at least one letter and at least one number in your passoword.');
+        valid = false;
+    }    
+    if (userName.length >= 500) {
+        dialogAlert('#signupDialog','Please do not exceed maximum length for Username (500 characters)');
+        valid = false;
+    } else if (userName.length <= 3) {
+        dialogAlert('#signupDialog','Please specify a username at least four characters long.');
+        valid = false;
+    }
+    if (professionVal.length >= 500) {
+        dialogAlert('#signupDialog','Please do not exceed maximum length for Current Profession (500 characters)');
+        valid = false;        
+    }  
+    if (websiteVal.length >= 500) {
+        dialogAlert('#signupDialog','Please do not exceed maximum length for Website URL (500 characters)');
+        valid = false;        
+    }  
+    if (areasVal.length >= 500) {
+        dialogAlert('#signupDialog','Please do not exceed maximum length for Areas of Expertise (500 characters).  Wow, you must have a lot of expertise!');
+        valid = false;        
+    } 
+    if (bioVal.length >= 500) {
+        dialogAlert('#signupDialog','Please do not exceed maximum length for Username (500 characters)');
+        valid = false;
+    }
+    if (websiteVal != '' && !validateURL(websiteVal)) {
+        dialogAlert('#signupDialog','The Website URL you specified does not look like a valid URL');
+        valid = false;
+    }
+    
+    if (email == '') {
+        dialogAlert('#signupDialog','Please enter a valid email address.');
+        valid = false;
+    } else if (!validateEmail(email)) {
+        dialogAlert('#signupDialog','The Email URL you specified does not look like a valid email address');
+        valid = false;
+    }
+    
+    return valid;
+}
+
+function createNewUser() {
+    if (validateSignupDialog()) {
+        startSpinnerOnButton('#submit_signupDialog');
+        $.ajaxSetup({
+    		url: "/signup",
+    		global: false,
+    		type: "POST",
+    		data: {
+    		    'userName': $("#signup_userName").val(),
+                'website':  $("#signup_userWebsite").val(),
+                'areas': $("#signup_userAreas").val(),
+                'profession': $("#signup_userProfession").val(),
+                'bio': $("#signup_userBio").val(),
+                'email': $("#signup_userEmail").val(),   
+                'password':$("#signup_password1").val(),
+    		},
+            success: function(data){
+    			obj = JSON.parse(data);
+    			if (obj.result == true) { 
+    			    stopSpinnerOnButton('#submit_signupDialog', createNewUser);
+    			    clearSignupDialog();            
+                    $("#signupDialog").modal('hide');                                           
+                    showSuccessAlert('User created successfully. Please check your email for a validation message.');
+    			} else {
+    				if (obj.error) {
+    		    		dialogAlert('#signupDialog',obj.error);
+    		    	} else {
+    		    		dialogAlert('#signupDialog',"There was an error");
+    		    	}
+                    stopSpinnerOnButton('#submit_signupDialog', createNewUser);            
+    			}
+    		},
+    		error: function(xhr, textStatus, error){
+                dialogAlert('#signupDialog','The server returned an error. You may try again. ' + error);
+                stopSpinnerOnButton('#submit_signupDialog', createNewUser);            
+            }
+    	});
+    	$.ajax();
+        
+    }    
+}
+
+function login() {
+    $('#frm_emailLoginDialog').submit();
+}
+
+function validateForgotPassword() {
+    valid = true;
+    email = $("#login_userEmail").val();
+    if (email == '') {
+        dialogAlert('#emailLoginDialog','Please enter your login email address or username.');
+        valid = false;
+    }  
+    return valid;
+}
+
+function forgotPassword() {
+    if (validateForgotPassword() &&
+        confirm("Send a password reset email to " + $("#login_userEmail").val() + "?  (Users with no email on file write to admin@whysaurus.com for a password reset.)")) {           
+            startSpinnerOnButton('#forgot_emailLoginDialog');        
+            $.ajaxSetup({
+        		url: "/forgot",
+        		global: false,
+        		type: "POST",
+        		data: {
+        		    'email': $("#login_userEmail").val(),
+        		},
+                success: function(data){
+        			obj = JSON.parse(data);
+        			if (obj.result == true) { 
+        			    stopSpinnerOnButton('#forgot_emailLoginDialog', forgotPassword);
+                        $("#emailLoginDialog").modal('hide');  
+                        if (obj.message) {
+                            showAlert(obj.message);
+                        } else {
+                            showSuccessAlert('We have sent an email with a password reset link to your email address.');                        
+                        }                
+        			} else {
+                        dialogAlert('#emailLoginDialog', obj.error ? obj.error : "There was an error");
+                        stopSpinnerOnButton('#forgot_emailLoginDialog', forgotPassword);            
+        			}
+        		},
+        		error: function(xhr, textStatus, error){
+                    dialogAlert('#emailLoginDialog','The server returned an error. You may try again. ' + error);
+                    stopSpinnerOnButton('#forgot_emailLoginDialog', forgotPassword);            
+                }
+        	});
+            $.ajax();
+    }
+}
+
+function initTinyMCE() {
+    
+    tinyMCE.init({
+      // General options
+      mode: "specific_textareas",
+      theme: "advanced",
+      editor_selector: "mceEditor",
+      editor_deselector: "mceNoEditor",
+      content_css : '/static/css/content.css',
+      paste_text_sticky: true,
+      paste_text_sticky_default: true,
+      plugins: "autolink,lists,spellchecker,iespell,inlinepopups,noneditable,paste",
+      // Theme options
+      theme_advanced_buttons1: "bold,italic,underline,|,sub,sup,bullist,numlist,blockquote,|,undo,redo,|,link,unlink,spellchecker",
+      theme_advanced_buttons2: "",
+      theme_advanced_buttons3: "",
+      theme_advanced_buttons4: "",
+      theme_advanced_toolbar_location: "top",
+      theme_advanced_toolbar_align: "left",
+      theme_advanced_statusbar_location: "none",
+      theme_advanced_resizing: true,
+      theme_advanced_resizing_use_cookie : false,
+      height : "60px",
+      // Skin options
+      skin: "o2k7",
+      skin_variant: "silver",
+      // Drop lists for link/image/media/template dialogs
+      template_external_list_url: "js/template_list.js",
+      external_link_list_url: "js/link_list.js",
+      external_image_list_url: "js/image_list.js",
+      media_external_list_url: "js/media_list.js",
+    });
+}
+
+function switchArea() {
+    $.ajaxSetup({
+		url: "/switchArea",
+		global: false,
+		type: "POST",
+		data:{},
+        success: function(data){
+			obj = JSON.parse(data);
+			if (obj.result == true) { 
+                window.location.href="/";                
+			} else {
+			    showAlert("Something went wrong. Not able to change area.");
+			}
+		},
+		error: function(xhr, textStatus, error){
+		    showAlert("There was an error. Not able to change area. " + textStatus);       
+        }
+	});
+	$.ajax();
+}
+
+function processNotification(messageObj) {
+     
+     var dataObj = JSON.parse(messageObj.data);
+     
+     // Insert new notification
+     $('#notificationMenuHeader').after(dataObj.notificationHTML);
+     
+     // Update the number
+     count = parseInt($('#notificationCount').text());
+     count = count + 1;
+     $('#notificationCount').text(count.toString());
+     $('#notificationCount').show();
+          
+     // Insert the raised date secs value
+     $('#notificationMenuHeader').data('latest', dataObj.timestamp)    
+         
+     $('.notificationMenuItem').click( function() {
+         window.location.href=$(this).data('refpoint');        
+     }); 
+     
+}
+
+function reconnectChannel(errorObj) {
+    if (channelErrors > 2) {
+         showAlert('Cannot receive notifications. Error was: ' + errorObj.description + ' Code: ' + errorObj.code);        
+     } else {
+         try {
+             channelErrors = channelErrors + 1;            
+         } catch (err) {
+             alert(err.message);
+         }
+         try {
+             $.ajaxSetup({
+            		url: "/newNotificationChannel",
+            		global: false,
+            		type: "POST",           		
+                 success: function(data) {
+            			obj = JSON.parse(data);
+            			if (obj.result == true) { 
+            			    channelToken = obj.token;
+            			    notificationChannelOpen();
+            			} else {
+            			    showAlert("Could not request notification channel.  Cannot receive notifications.");
+            			}
+            		},
+            		error: function(xhr, textStatus, error){
+            		    showAlert("Error connecting to notification channel: " + textStatus);       
+                 },
+            	}); 
+         } catch (err) {
+             alert("2" + err.message);            
+         }
+         $.ajax();        
+     }    
+}
+
+function notificationChannelOpen() {
+    if (typeof(channelToken) != "undefined") {
+        lastNotiSecs = $("#notificationMenuHeader").data('latest');
+        channel = new goog.appengine.Channel(channelToken);
+        socket = channel.open();
+        socket.onmessage = processNotification;
+        socket.onclose = reconnectChannel;
+    }
+  
+}
+
+
+function markNotificationsRead() {
+    latest = $('#notificationMenuHeader').data('latest');
+    earliest = $('#notificationMenuHeader').data('earliest');
+    if (typeof(latest) != "undefined") {
+        $.ajaxSetup({
+        	url: "/clearNotifications",
+        	global: false,
+        	type: "POST",  
+        	data:{
+        	    'latest':latest,
+        	    'earliest':earliest
+        	},         		
+            success: function(data) {
+                obj = JSON.parse(data);
+        		if (obj.result == true) {
+                    $('#notificationCount').text(0);
+                    $('#notificationCount').hide();
+                } else {
+                    console.log('CleanNotifications call returned error: ' + obj.error);        	    
+                }            
+        	},
+        	error: function(xhr, textStatus, error){
+        	    console.log('Error clearing notifications: ' + textStatus);
+            },
+        });
+        $.ajax();
+    }
+}
+
+function makeNotificationMenuClickable() {
+    $('.notificationMenuItem').click( function() {
+        window.location.href=$(this).data('refpoint');        
+    });
+    
+    $('#notificationMenuHeader').click(function () {
+        window.location.href=userURL;                
+    });
+    
+    $('#notificationMenuFooter').click(function () {
+        window.location.href=userURL;                
+    });
+    
+    $('#notifications').click(markNotificationsRead);
+}
+
+
+var channelErrors = 0; 
 var FILEPICKER_SERVICES = ['IMAGE_SEARCH', 'COMPUTER', 'URL', 'FACEBOOK'];
+
 $(document).ready(function() {
   filepicker.setKey("AinmHvEQdOt6M2iFVrYowz");
   $.fn.bindFilepicker = function(){
@@ -273,13 +741,12 @@ $(document).ready(function() {
         function(fpfiles){
           var file = fpfiles[0];
 
-          $(self).next('.filepicker-placeholder').attr('src', '/static/img/icon_triceratops_black_47px.png').addClass('spin');
+          $('.filepicker-placeholder').attr('src', '/static/img/icon_triceratops_black_47px.png').addClass('spin');
 
           filepicker.convert(file, {width: 112, height: 112, fit: 'clip'}, {path: 'SummaryBig-' + file.key});
           filepicker.convert(file, {width: 310, fit: 'clip'}, {path: 'FullPoint-' + file.key});
           filepicker.convert(file, {width: 54, height: 54, fit: 'clip'}, {path: 'SummaryMedium-' + file.key}, function(medium){
-            $(self)
-              .next('.filepicker-placeholder')
+            $('.filepicker-placeholder')
               .attr('src', 'http://d3uk4hxxzbq81e.cloudfront.net/' + encodeURIComponent(medium.key))
               .removeClass('spin');
           });
@@ -294,153 +761,156 @@ $(document).ready(function() {
 
   $('#pointDialog .filepicker').bindFilepicker();
 
-
-  tinyMCE.init({
-    // General options
-    mode: "specific_textareas",
-    theme: "advanced",
-    editor_selector: "mceEditor",
-    editor_deselector: "mceNoEditor",
-    paste_text_sticky: true,
-    paste_text_sticky_default: true,
-    plugins: "autolink,lists,spellchecker,iespell,inlinepopups,noneditable,paste",
-    // Theme options
-    theme_advanced_buttons1: "bold,italic,underline,|,sub,sup,bullist,numlist,blockquote,|,undo,redo,|,link,unlink,spellchecker",
-    theme_advanced_buttons2: "",
-    theme_advanced_buttons3: "",
-    theme_advanced_buttons4: "",
-    theme_advanced_toolbar_location: "top",
-    theme_advanced_toolbar_align: "left",
-    theme_advanced_statusbar_location: "none",
-    theme_advanced_resizing: false,
-    // Skin options
-    skin: "o2k7",
-    skin_variant: "silver",
-    // Drop lists for link/image/media/template dialogs
-    template_external_list_url: "js/template_list.js",
-    external_link_list_url: "js/link_list.js",
-    external_image_list_url: "js/image_list.js",
-    media_external_list_url: "js/media_list.js",
-    /*setup: function(ed) {
-        // All this to try deal with placeholder text
-        // Could not get it to work for gaining focus when
-        // tabbing into the editor BLEH
-        var tinymce_placeholder = $('#createPointDialog');
-
-        ed.onInit.add(function(ed) {
-            // get the current content
-            var cont = ed.getContent();
-            // If its empty and we have a placeholder set the value
-            if(cont.length == 0){
-               ed.setContent(CONST_EDITOR_DEFAULT_TEXT);
-            }
-        });
-
-        ed.onMouseDown.add(function(ed,e) {
-            clearDefaultContent(ed);
-        });
-
-        ed.onNodeChange.add(function(ed,e) {
-            clearDefaultContent(ed);
-        });
-      } */
-  });
-
-
   $("#searchBox").keyup(function(event) {
     if (event.keyCode == 13) {
-      window.location.href = "/search?searchTerms=" + $("#searchBox", $("#searchArea")).val();
+        getSearchResults($("#searchBox").val());
     }
   });
-
+  
   $(".searchIcon", $("#searchArea")).click(function(event) {
     if ($("#searchBox").val() != "") {
-      window.location.href = "/search?searchTerms=" + $("#searchBox", $("#searchArea")).val();
+        getSearchResults($("#searchBox").val());
     }
   });
 
+  initTinyMCE();
 
-  // Dialog form handling
-  /*$("#dialogForm").dialog({
-    autoOpen: false,
-    height: getWindowHeight() * .9,
-    width: $(window).width()*.7,
-    modal: true
-  });
-
-  if (!loggedIn) {
-    $("#loginDialog").dialog({
-      autoOpen: false,
-      height: 250,
-      width: 270,
-      modal: true
-    });
-  }*/
-
-  $('[id^="point_New_"]').click(function() {
-      window.location.href = $(".navWhy", $(this)).attr('href');
-  });
-
-  $('[id^="signInWithFacebook"]').click(function() {
-      window.location.href = "/auth/facebook";
-  });
-
-  $('[id^="signInWithGoogle"]').click(function() {
-      window.location.href = "/auth/google";
-  });
-
-  $('[id^="signInWithTwitter"]').click(function() {
-      window.location.href = "/auth/twitter";
-  });
-  window.onload = function() {
-    positionEditDialog();
-  };
-  window.onresize = function() {
-    positionEditDialog();
-  };
-
-  if (!loggedIn) {
-    $("#CreatePoint").attr('href', "#loginDialog");
-    $("#CreatePoint").attr('data-toggle', "modal");
-  } else {
-
-    $( "#CreatePoint" ).on('click', function() {
-        $("#submit_pointDialog").data("dialogaction", "new");
-        $('div.modal-header h3').text("New Point");
-        $("#pointDialog").modal('show');
+    $('[id^="signInWithFacebook"]').click(function() {
+        window.location.href = "/auth/facebook";
     });
 
-    $("#pointDialog").on('hidden', function() {
-      var edSummary = tinyMCE.get('editor_pointDialog');
-      edSummary.setContent('');
-      $('#title_pointDialog').val('');
-      setCharNumText($('#title_pointDialog')[0]);
-      $('#link_pointDialog').val('');
-      $('#author_pointDialog').val('');
-      $('#description_pointDialog').val('');
-      $('.filepicker-placeholder').attr('src', "/static/img/placeholder_50x50.gif");
-      $('[name=source_pointDialog]').remove();
-      $('#pointDialog').removeData('sourcesToRemove');     
-      $('#sourceURL_pointDialog').val("");
-      $('#sourceTitle_pointDialog').val("");
-       
+    $('[id^="signInWithGoogle"]').click(function() {
+        window.location.href = "/auth/google";
     });
 
-    $("#submit_pointDialog").on('click', function(e) {
-        submitPointDialog(this);
+    $('[id^="signInWithTwitter"]').click(function() {
+        window.location.href = "/auth/twitter";
     });
     
-    $("#sourcesAdd").on('click', function(e) {
-        e.preventDefault();
-        addSource(this);
+    /*window.onload = function() {
+        positionEditDialog();
+    };
+    window.onresize = function() {
+        positionEditDialog();
+    };*/
+
+    // Beginning state for the TABBED AREAS
+    $('.tabbedArea').hide(); $('#recentActivityArea').show();
+
+    $('#recentActivity').click(function() {
+        toggleTabbedArea(this, "#recentActivityArea");        
     });
+    
+    $('#topProjects').click(function() {
+        loadPointList('topProjects', '#topProjectsArea', this);
+    });
+    
+    $('#topObjectives').click(function() {
+        loadPointList('topObjectives', '#topObjectivesArea', this);
+    });
+    
+    $('#topOrganizations').click(function() {
+        loadPointList('topOrganizations', '#topOrganizationsArea', this);
+    });
+    
+    
+    
+    makePointsCardsClickable();	
+    $( "#recentlyViewed .pointSmall" ).click( function() {
+        window.location.href=$(".smallTitle a", $(this)).attr('href');
+    });
+       
+    if (!loggedIn) {
+        $("#AddNewDropdownToggle").attr('href', "#loginDialog");
+        $("#AddNewDropdownToggle").attr('data-toggle', "modal");
+        $("#loginWithEmail").on('click', function() {
+            $("#emailLoginDialog").modal('show');
+        });
+        $("#showSignupDialog").on('click', function() {
+            $("#emailLoginDialog").modal('hide');
+            $("#signupDialog").modal('show')            
+        });
+        
+        $("#signInWithEmail_Dlg").on('click', function() {
+            $("#loginDialog").modal('hide');
+            $("#emailLoginDialog").modal('show');           
+        });
+        
+        $("#backToLogin").on('click', function() {
+            $("#signupDialog").modal('hide');                       
+            $("#loginDialog").modal('show');
+        });
+        
+        $('#submit_signupDialog').click( createNewUser );
+        $('#submit_emailLoginDialog').click( login );    
+        $('#forgot_emailLoginDialog').click( forgotPassword );        
+                                  
+    } else {
+        $( "#NewProject" ).on('click', function() {
+            $("#submit_pointDialog").data("dialogaction", "new");
+            $("#submit_pointDialog").data("nodetype", "Project");
+            $('div.modal-header h3', $('#pointDialog')).text("New Project");
+            $("#pointDialog").modal('show');
+        });
 
-    $("#title_pointDialog").on('keyup', function(e) {setCharNumText(e.target);});
+        $( "#NewObjective" ).on('click', function() {
+            $("#submit_pointDialog").data("dialogaction", "new");
+            $("#submit_pointDialog").data("nodetype", "Objective");
+            $('div.modal-header h3', $('#pointDialog')).text("New Objective");
+            $("#pointDialog").modal('show');
+        });
+        
+        $( "#NewOrganization" ).on('click', function() {
+            $("#submit_pointDialog").data("dialogaction", "new");
+            $("#submit_pointDialog").data("nodetype", "Organization");
+            $('div.modal-header h3', $('#pointDialog')).text("New Organization");
+            $("#pointDialog").modal('show');
+        });
+        
+        $("#pointDialog").on('hidden', function() {
+          var edSummary = tinyMCE.get('editor_pointDialog');
+          edSummary.setContent('');
+          $('#title_pointDialog').val('');
+          setCharNumText($('#title_pointDialog')[0]);
+          $('#link_pointDialog').val('');
+          $('#author_pointDialog').val('');
+          $('#description_pointDialog').val('');
+          $('.filepicker-placeholder').attr('src', "/static/img/placeholder_50x50.gif");
+          $('[name=source_pointDialog]').remove();
+          $('#pointDialog').removeData('sourcesToRemove');     
+          $('#sourceURL_pointDialog').val("");
+          $('#sourceTitle_pointDialog').val("");
+   
+        });
+        
+        $("#pointDialog").on('shown', function() {
+            $('#title_pointDialog').focus();
+        });
 
-    $(".removeSource").on('click', function(e) {removeSource(this);});
+        $("#submit_pointDialog").on('click', function(e) {
+            submitPointDialog(this);
+        });
 
-  }
+        $("#sourcesAdd").on('click', function(e) {
+            e.preventDefault();
+            addSource(this);
+        });
 
+        $("#title_pointDialog").on('keyup', function(e) {setCharNumText(e.target);});
+
+        $(".removeSource").on('click', function(e) {removeSource(this);});
+        $("#areaSwap").on('click', switchArea);   
+        makeNotificationMenuClickable();     
+        notificationChannelOpen();
+    }
+    
+    // Unsupported browser alert
+    
+    var isOpera = !!window.opera || navigator.userAgent.indexOf(' OPR/') >= 0;
+    var isChrome = !!window.chrome && !isOpera;         
+    if (isChrome == false) {
+        showAlert('You are using Whysaurus in a unsupported browser.  Only Chrome is currently fully supported.');
+    }
 
 
   //Add Hover effect to menus.  Well, it doesn't work very well...

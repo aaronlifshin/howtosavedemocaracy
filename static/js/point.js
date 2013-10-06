@@ -1,6 +1,4 @@
-function showAlert(alertHTML) {
-    $('.topSpace').html($('<div class="alert"><button type="button" class="close" data-dismiss="alert">&times;</button>' + alertHTML + '</div>'));
-}
+
 
 function searchDialogAlert(alertHTML) {
     $('#linkedPointSearchDialog #alertArea').html($('<div class="alert"><button type="button" class="close" data-dismiss="alert">&times;</button>' + alertHTML + '</div>'));
@@ -57,10 +55,9 @@ function callPointEdit(){
 				var ed = tinyMCE.get('editor_pointDialog');
 			    obj = JSON.parse(data);
 				$('.mainPointContent').html(ed.getContent());
-				$('.mainPointTitle h1').html($('#title_pointDialog').val());
-				$('.mainPointVersion').html(obj.version);
-				$('.mainPointAuthor').html(obj.author);
-				$('.mainPointDateEdited').html(obj.dateEdited);
+				$('.mainPointTitle').html($('#title_pointDialog').val());
+				$('.mainPointLastEdited').html('Last edited ' + obj.dateEdited + 
+				    ' by <a href=\'/user/' + obj.authorURL +'\'>'+ obj.author + '</a>');
                 if (obj.imageURL) {
                     $('.pointDisplay').attr('src', "//d3uk4hxxzbq81e.cloudfront.net/FullPoint-" + encodeURIComponent(obj.imageURL))
                 }
@@ -143,21 +140,25 @@ function updateVoteButtonLabels(newVote){
         var newVal = parseInt(upvoteLabel) + 1;
         $( "#upVote a" ).text(newVal.toString());
         $( "#bigScore" ).text(parseInt(bigScore) + 1);
+        $("#voteLabel").text("You agree");
         upVoteToggle(true);
     } else if (myVote == 0 && newVote == -1) { // DOWNVOTE
         var newVal = parseInt(downvoteLabel) + 1;
         $( "#downVote a" ).text(newVal.toString());
         $( "#bigScore" ).text(parseInt(bigScore) - 1);
+        $("#voteLabel").text("You disagree");        
         downVoteToggle(true);
     } else if (myVote == 1  &&  newVote == 0) { // CANCEL UPVOTE
         var newVal = parseInt(upvoteLabel) - 1;
         $( "#upVote a" ).text(newVal.toString());
         $( "#bigScore" ).text(parseInt(bigScore) - 1);
+        $("#voteLabel").text("You abstain");                
         upVoteToggle(false);
     } else if (myVote == -1  &&  newVote == 0) { // CANCEL DOWNVOTE
         var newVal = parseInt(downvoteLabel) - 1;
         $( "#downVote a" ).text(newVal.toString());
         $( "#bigScore" ).text(parseInt(bigScore) + 1);
+        $("#voteLabel").text("You abstain");                
         downVoteToggle(false);
     } else if (myVote == -1  &&  newVote == 1) { // DOWN TO UP
         var newVal = parseInt(downvoteLabel) - 1;
@@ -165,6 +166,7 @@ function updateVoteButtonLabels(newVote){
         var newVal = parseInt(upvoteLabel) + 1;
         $( "#upVote a" ).text(newVal.toString());
         $( "#bigScore" ).text(parseInt(bigScore) + 2);
+        $("#voteLabel").text("You agree");        
         downVoteToggle(false);
         upVoteToggle(true);
     } else if (myVote == 1  &&  newVote == -1) {// UP TO DOWN
@@ -173,6 +175,7 @@ function updateVoteButtonLabels(newVote){
         var newVal = parseInt(upvoteLabel) - 1;
         $( "#upVote a" ).text(newVal.toString());
         $( "#bigScore" ).text(parseInt(bigScore) - 2);
+        $("#voteLabel").text("You disagree");                
         upVoteToggle(false);
         downVoteToggle(true);
     }
@@ -222,7 +225,7 @@ function downVote() {
 }
 
 function changeRibbon() {
-    var newRibbonValue = !$("#blueRibbon").data("ribbonvalue");
+    var newRibbonValue = !$("#blueRibbon").data("ribbonvalue"); // "false" -> true
     $.ajaxSetup({
         url: "/setribbon",
         global: false,
@@ -234,7 +237,7 @@ function changeRibbon() {
         success: function(data){
             obj = JSON.parse(data);
             if (obj.result == true) {
-              updateRibbon(newRibbonValue);
+              updateRibbon(newRibbonValue, obj.ribbonTotal);
             } else {
               alert('An error happened and your award may not have counted. Try after a page refresh?');
             }
@@ -243,18 +246,18 @@ function changeRibbon() {
     $.ajax();
 }
 
-function updateRibbon(newRibbonValue) {
+function updateRibbon(newRibbonValue, ribbonTotal) {
     $("#blueRibbon").data("ribbonvalue", newRibbonValue);
     if (newRibbonValue) {
         $("#blueRibbon a").removeClass("notAwarded");   
         $("#blueRibbon a").removeClass("hover");  
-        $("#blueRibbon a").addClass("awarded");                          
+        $("#blueRibbon a").addClass("awarded");                     
     } else {
         $("#blueRibbon a").removeClass("hover");                
         $("#blueRibbon a").removeClass("awarded");
-        $("#blueRibbon a").addClass("notAwarded");
-        
+        $("#blueRibbon a").addClass("notAwarded");        
     }
+    $("#ribbonTotal").text(ribbonTotal);
 }
 
 function deletePoint(urlToDelete) {
@@ -289,8 +292,9 @@ function make_this_show_login_dlg(button) {
 
 function populateEditFields() {
   var ed = tinyMCE.get('editor_pointDialog');
-
-  $('div.modal-header h3').text("Edit Point");
+  var nodetype = $('#pointSummary').data('nodetype')
+  
+  $('div.modal-header h3', $('#pointDialog')).text("Edit " + nodetype);
 
   $('#title_pointDialog').val($('#pointSummary div.mainPointTitle').text());
   setCharNumText($('#title_pointDialog')[0]);
@@ -315,13 +319,6 @@ function populateEditFields() {
     }
   }
 
-}
-
-function toggleTabbedArea(selectedTab, tabbedAreaToShow) {
-	$('.tab').removeClass('selectedTab');
-	$(selectedTab).addClass('selectedTab');
-	$('.tabbedArea').hide();
-	$(tabbedAreaToShow).show();
 }
 
 function selectPoint(supportingPointURL, currentPointURL, linkType){
@@ -379,7 +376,7 @@ function pointListAppend(linkType, point, numLinkPoints) {
     // The vote total and title
     titleDiv = jQuery('<div/>',{class:"span8 title"} );
 	titleDiv.html("<h5><span class=\"score\">" + point.voteTotal +
-	              "</span> <a href=\"/point/" + point.url + "\"> " + point.title + "</a></H5>");
+	              "</span>" + point.title + "</H5>");
 
     // The image div
     imageDiv = jQuery('<div/>',{class:"span2"} );
@@ -405,8 +402,7 @@ function pointListAppend(linkType, point, numLinkPoints) {
     appendAfter.append(pointDiv);
     setPointListHeader(linkType);
     linkPointControlsInitialState();
-    makePointAreasClickable();
-
+    makeLinkedPointsClickable();
 }
 
 
@@ -458,7 +454,7 @@ function addPoint(linkType){
 			}
 		},
 		error: function(xhr, textStatus, error){
-            editDialogAlert('The server returned an error. You may try again.');
+            editDialogAlert('The server returned an error: ' + str(error) + ' You may try again.');
             stopSpinner();
         }
 	});
@@ -517,24 +513,37 @@ function setUpMenuAreas() {
         $("#submit_pointDialog").data("dialogaction", "edit")
         $("#pointDialog").modal('show');
     });
+    
+    $( "#addImage" ).on('click', function() {
+        populateEditFields();
+        $("#submit_pointDialog").data("dialogaction", "edit")
+        $("#pointDialog").modal('show');
+    });
+    
+    $( "#changeImage" ).on('click', function() {
+        populateEditFields();
+        $("#submit_pointDialog").data("dialogaction", "edit")
+        $("#pointDialog").modal('show');
+    });
 
     // Create a new linked point
     $( "[name=createLinked]" ).on('click', function() {
         var linkType = $(this).data('linktype');
         $("#submit_pointDialog").data("dialogaction", "createLinked");
         $("#submit_pointDialog").data("linktype", linkType);
+        $("#submit_pointDialog").data("nodetype", "Point");
         var dialogName = "Create " + linkType.capitalize() + " Point";
-        $('div.modal-header h3').text(dialogName);
+        $('div.modal-header h3', $('#pointDialog')).text(dialogName);
         $("#pointDialog").modal('show');
     });
     
-    $( "[name=supporting_searchForPoint]" ).on('click', function(e){
-        $("#selectLinkedPointSearch").data("linkType", "supporting");
+    $( "[name$=_searchForPoint]" ).on('click', function(e){
+        $("#selectLinkedPointSearch").data("linkType", $(this).data('linktype'));
         $("#linkedPointSearchDialog").modal('show');
     });
 }
 
-function makePointAreasClickable() {
+function makeLinkedPointsClickable() {
     $('[id^="supportingPoint_"]').click(function() {
         if (!$(".navWhy", $(this)).hasClass("ui-helper-hidden")) { // The navWhy is sometimes hidden by the unlink button
           window.location.href = $(".navWhy", $(this)).attr('href');
@@ -548,6 +557,77 @@ function makePointAreasClickable() {
     });
 }
 
+function setCommentCount() {
+    numComments = $(".cmmnt").length;    
+    $('#commentCount').text(numComments + " comment" + (numComments == 1? "":"s"));
+}
+
+function insertComment(commentObj) {
+    html = "<div class=\"row-fluid cmmnt level" + commentObj.level + "\">" +
+      "<div class=\"cmmnt-content span11\">" + commentObj.text + "<a href=\"/user/"+  commentObj.userURL +
+      "\" class=\"userlink\">" + commentObj.userName + "</a> - <span class=\"pubdate\">"  + commentObj.date + 
+      "</span> </div> <div class=\"span1\">" +
+          "<a name=\"commentReply\" data-parentkey="+ commentObj.myUrlSafe + ">Reply</a></div></li>"
+          
+    if (!commentObj.parentUrlsafe || commentObj.parentUrlsafe == '') {
+        $('#comments').prepend(html);        
+    } else {
+        linkToInsertBelow = $("a[data-parentkey=\"" + commentObj.parentUrlsafe + "\"]");
+        linkToInsertBelow.parent().parent().after(html);
+    }
+    
+    $("[name=commentReply]").unbind("click", showReplyComment);    
+    $("[name=commentReply]").on("click", showReplyComment);
+    setCommentCount();
+}
+
+function showReplyComment(event) {
+    $('#addComment').removeClass('hide');
+    tinyMCE.execCommand('mceRemoveControl', false, 'commentText');
+    $("#addComment").insertAfter($(event.target).parent().parent());
+    initTinyMCE();
+    $("#addComment").data('parentkey', $(event.target).data('parentkey'));
+    $('body, html').animate({ scrollTop: $("#addComment table").offset().top - 100 }, 500);
+    $('#showAddComment').parent().removeClass('hide');    
+}
+
+function saveComment(event) {
+    var ed = tinyMCE.get('commentText');
+    commentText = ed.getContent();    
+    if (commentText.trim() == '') return;
+    
+    startSpinnerOnButton('#saveCommentSubmit');    
+    $.ajaxSetup({
+		url: "/saveComment",
+		global: false,
+		type: "POST",
+		data: {
+		    'commentText': ed.getContent(),
+        	'p':$('#rootUrlSafe').val(),
+        	'parentKey': $('#addComment').data('parentkey')
+		},
+		success: function(data){
+			obj = JSON.parse(data);
+			if (obj.result == true) {
+                insertComment(obj);
+                ed.setContent('');                                              
+                stopSpinnerOnButton('#saveCommentSubmit', saveComment);
+                $('#addComment').addClass('hide');  
+                $('#addComment').data('parentkey', '');
+			} else {
+			    showAlertAfter(obj.error ? obj.error: "There was an error", "#addComment");
+                stopSpinnerOnButton('#saveCommentSubmit', saveComment);
+			}
+		},
+		error: function(xhr, textStatus, error){
+            showAlertAfter('The server returned an error. You may try again.', "#addComment");
+            stopSpinnerOnButton('#saveCommentSubmit', saveComment);
+        }
+	});
+	$.ajax();
+    
+}
+
 $(document).ready(function() {
 
     if (!loggedIn) {
@@ -557,10 +637,13 @@ $(document).ready(function() {
         make_this_show_login_dlg($( "[id$=addPointWhenNonZero]" ));
         make_this_show_login_dlg($( "[id$=addPointWhenZero]" ));
         make_this_show_login_dlg($( "#editPoint" ));
+        make_this_show_login_dlg($( "#changeImage" ));
+        make_this_show_login_dlg($( "#addImage" ));        
         make_this_show_login_dlg($( "#upVote" ));
         make_this_show_login_dlg($( "#downVote" ));
         make_this_show_login_dlg($( "#viewPointHistory" ));
-
+        make_this_show_login_dlg($( "#showAddComment" ));
+        make_this_show_login_dlg($( "[name=commentReply]" ));        
     } else {
         /*$( "[name=linkSupportingPoint]" ).click(function() {
           var params = [];
@@ -580,10 +663,8 @@ $(document).ready(function() {
         //$('#upVote').button({ icons: {primary: 'ui-icon-up', secondary: null}});
 
         $( "#downVote" ).click(function() {	downVote();	});
-        $( "#blueRibbon" ).click(function() {changeRibbon();});
-        
+        $( "#blueRibbon" ).click(function() {changeRibbon();});        
 
-        makePointAreasClickable();
         setUpMenuAreas();
 
         $('#linkedPointSearchDialog').on('hidden', function () {
@@ -608,9 +689,20 @@ $(document).ready(function() {
     			$.ajax();
     	    }
         });
+        $('#showAddComment').click(function() {
+            tinyMCE.execCommand('mceRemoveControl', false, 'commentText');
+            $("#addComment").insertAfter($(event.target).parent());    
+            initTinyMCE();            
+            $('#addComment').removeClass('hide');
+            $('#showAddComment').parent().addClass('hide');
+            $('#addComment').data('parentkey', '');
+            $('body, html').animate({ scrollTop: $("#addComment table").offset().top - 100 }, 500);        
+        });
 
+        $('[name=commentReply]').click(showReplyComment);
     }
-
+    
+    makeLinkedPointsClickable();
     linkPointControlsInitialState();
 
     $( "#deletePoint" ).button();
@@ -619,12 +711,13 @@ $(document).ready(function() {
     $('.tabbedArea').hide(); $('#supportingPointsArea').show();
 
     $('#viewSupportingPoints').click(function() {
-    toggleTabbedArea(this, "#supportingPointsArea");
+        toggleTabbedArea(this, "#supportingPointsArea");
     });
+    
+    $('#saveCommentSubmit').click(saveComment);
 
-    $('#viewComments').click(function() {
-      toggleTabbedArea(this, "#disqus_thread");
-    });
+
+    
 
     $('#viewPointHistory').click(function() {
     	$('#historyArea').html('<div id="historyAreaLoadingSpinner"><img src="/static/img/ajax-loader.gif" /></div>');
@@ -643,5 +736,4 @@ $(document).ready(function() {
     		},
     	});
     });
-
 });

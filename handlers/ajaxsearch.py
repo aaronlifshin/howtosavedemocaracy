@@ -10,7 +10,10 @@ import constants
 class AjaxSearch(AuthHandler):
     def post(self):
         resultJSON = json.dumps({'result': False})
-        searchResults = Point.search(self.request.get('searchTerms'), self.request.get('exclude'), self.request.get('linkType') )
+        searchResults = Point.search(searchTerms=self.request.get('searchTerms'), 
+                                     excludeURL=self.request.get('exclude'), 
+                                     linkType=self.request.get('linkType') 
+                                     )
         template_values = {
             'searchResults': searchResults,
             'linkType': self.request.get('linkType'),

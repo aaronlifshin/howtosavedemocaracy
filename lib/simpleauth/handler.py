@@ -29,7 +29,7 @@ except ImportError:
 # from lxml import etree
 
 # it's a OAuth 1.0 spec even though the lib is called oauth2
-import oauth2 as oauth1
+import lib.oauth2 as oauth1
 
 # users module is needed for OpenID authentication.
 from google.appengine.api import urlfetch, users
@@ -177,7 +177,7 @@ class SimpleAuthHandler(object):
 
   def _oauth2_init(self, provider, auth_url):
     """Initiates OAuth 2.0 web flow"""
-    logging.info('OAUTH INIT')
+    logging.info('OAUTH2 INIT')
     key, secret, scope = self._get_consumer_info_for(provider)
     callback_url = self._callback_uri_for(provider)
 
@@ -196,7 +196,7 @@ class SimpleAuthHandler(object):
       self.session[self.OAUTH2_CSRF_SESSION_PARAM] = state
 
     target_url = auth_url.format(urlencode(params)) 
-    logging.debug('Redirecting user to %s', target_url)
+    logging.debug('OAUTH2 INIT: Redirecting user to %s', target_url)
 
     self.redirect(target_url)      
     

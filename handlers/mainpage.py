@@ -1,5 +1,6 @@
 import os
 import constants
+import logging
 
 from google.appengine.ext.webapp import template
 
@@ -21,15 +22,12 @@ class MainPage(AuthHandler):
         else:
             recentlyViewedPoints = []
 
-        editorsPicksPoints = PointRoot.getEditorsPicks()
-        topPoints = PointRoot.getTopRatedPoints(filterList=editorsPicksPoints)
         template_values = {
-            'newPoints': newPoints,
-            'topPoints': topPoints,
-            'editorsPicks': editorsPicksPoints,
+            'recentlyActive': newPoints,
             'recentlyViewed': recentlyViewedPoints,
             'user': user,
-            'thresholds': constants.SCORETHRESHOLDS
+            'thresholds': constants.SCORETHRESHOLDS,
+            'currentArea':self.session.get('currentArea')
         }
         path = os.path.join(constants.ROOT, 'templates/index.html')
         self.response.out.write(template.render(path, template_values))

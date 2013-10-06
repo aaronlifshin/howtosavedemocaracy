@@ -9,7 +9,6 @@ from models.redirecturl import RedirectURL
 
 class ViewPoint(AuthHandler):
     def createTemplateValues(self, point, pointRoot):
-        devInt = 1 if constants.DEV else 0
         supportingPoints = point.getSupportingPoints()
         counterPoints = point.getCounterPoints()
         sources = point.getSources()
@@ -26,7 +25,8 @@ class ViewPoint(AuthHandler):
         if user:
             recentlyViewed = user.getRecentlyViewed(excludeList=[point.key.parent()] + \
                                                     point.supportingPointsRoots + \
-                                                    point.counterPointsRoots)
+                                                    point.counterPointsRoots,
+                                                    limitByType='Point')
             addedToRecentlyViewed = user.updateRecentlyViewed(point.key.parent())
 
         # For now add to a point's view count if user is not logged in or if view point is added to the recently viewed list
@@ -37,18 +37,18 @@ class ViewPoint(AuthHandler):
             'point': point,
             'pointRoot': pointRoot,
             'recentlyViewedPoints': recentlyViewed,
-            'numPoints': len(point.supportingPoints),
             'supportingPoints': supportingPoints,
-            'numSupportingPoints': len(supportingPoints) if supportingPoints else 0,
             'counterPoints': counterPoints,
             'supportedPoints':pointRoot.getBacklinkPoints("supporting"),
             'counteredPoints':pointRoot.getBacklinkPoints("counter"),
+            'comments':pointRoot.getComments(),
             'sources': sources,
             'user': user,
-            'devInt': devInt,  # For Disqus
             'voteValue': voteValue,
             'ribbonValue': ribbonValue,
-            'thresholds': constants.SCORETHRESHOLDS
+            'notifications': user.notifications if user else None,
+            'thresholds': constants.SCORETHRESHOLDS,
+            'currentArea':self.session.get('currentArea')
         }
         return template_values
     def outputTemplateValues(self, template_values):
@@ -65,20 +65,23 @@ class ViewPoint(AuthHandler):
         self.outputTemplateValues(template_values)
         
     def get(self, pointURL):
-        # check if dev environment for Disqus
-        logging.info('Viewing Point %s' % pointURL)
         point, pointRoot = Point.getCurrentByUrl(pointURL)
         if point is None:
             # Try to find a redirector
             newURL = RedirectURL.getByFromURL(pointURL)
             if newURL:
                 self.redirect(str(newURL), permanent=True)
-            else:
-                self.response.out.write('Could not find point: ' + pointURL)
-                return
 
         if point:
             template_values = self.createTemplateValues(point, pointRoot)
             self.outputTemplateValues(template_values)
         else:
-            self.response.out.write('Could not find point: ' + pointURL)
+            template_values = {
+                               'user': self.current_user,
+                               'message': "Could not find point. \
+                               Some points are in private areas and you \
+                               need to be logged into those areas to view them.",
+                               'currentArea':self.session.get('currentArea')
+            }
+            path = os.path.join(os.path.dirname(__file__), '../templates/message.html')
+            self.response.out.write(template.render(path, template_values ))      

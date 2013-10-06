@@ -2,187 +2,245 @@
 
 {% block mainPageContent %}
   <script type="text/javascript" src="/static/js/point.js"></script>
-
+  
   {% if user %}
-
     {% with point.title as pointTitle %}
         {% include 'selectSupportingPointsSearch.html' %}
     {% endwith %}
-
   {% endif %}
 
-  <div class="row topSpace"></div>
-    <div class="dropdown pull-left">
-        <button class="dropdown-toggle {% if not supportedPoints %} disabled {% endif %}" id="supportedByMeMenu" data-toggle="dropdown">
-         {% if not supportedPoints %} none {% else %} {{ supportedPoints|length }} {% endif %} supported
-        </button>                
-          <ul class="dropdown-menu" role="menu" aria-labelledby="supportedByMeMenu">
-              {% for supPoint in supportedPoints %}
-                  <li><a tabindex="-1"
-                  alt="View {{ supPoint.title|escape }}" 
-                  href="/point/{{ supPoint.url }}">{{supPoint.title|escape}}</a></li>                                        
-              {% endfor %}
-          </ul>
-     </div>
-     <div class="dropdown pull-left">           
-        <button class="dropdown-toggle {% if not counteredPoints %} disabled {% endif %} " 
-        id="counteredByMeToggle" data-toggle="dropdown">            
-         {% if not counteredPoints %} none {% else %} {{ counteredPoints|length }} {% endif %} countered 
-        </button> 
-        <ul class="dropdown-menu" role="menu" aria-labelledby="counteredByMeMenu">
-              {% for cnPoint in counteredPoints %}
-                  <li><a tabindex="-1"
-                  alt="View {{ cnPoint.title|escape }}" 
-                  href="/point/{{ cnPoint.url }}">{{cnPoint.title|escape}}</a></li>                                        
-              {% endfor %}
-          </ul>
-     </div>  
   <div class="row">
-    <div id="pointArea" class="boxedElement span12 dropShadow">
-      <div id="scoreAndVotingSection" class="span1 pagination-centered">
-                <div id="blueRibbon" class="voteArea" 
-                    data-ribbonvalue="{{ribbonValue}}">
-                  <a class="pagination-centered 
-                    {% if ribbonValue %} awarded {% else %} notAwarded {% endif %}" 
-                    alt="Award Ribbon" src="/static/img/blueribbon.png"> </a>
+    <div class="span8">
+      <div class="row-fluid">
+        <div class="dropdown pull-left">
+            <button class="dropdown-toggle upTreeMenus {% if not supportedPoints %} disabled {% endif %}" id="supportedByMeMenu" data-toggle="dropdown">
+             {% if supportedPoints %}
+                Supporting {{ supportedPoints|length }} point{% if supportedPoints|length != 1 %}s{% endif %}    
+                <span class="caret"></span>              
+             {% else %} 
+                Supporting 0 points 
+             {% endif %}
+            </button>
+              <ul class="dropdown-menu" role="menu" aria-labelledby="supportedByMeMenu">
+                  {% for supPoint in supportedPoints %}
+                      <li><a tabindex="-1"
+                      alt="View {{ supPoint.title|escape }}"
+                      href="/point/{{ supPoint.url }}">{{supPoint.title|escape}}</a></li>
+                  {% endfor %}
+              </ul>
+        </div>
+        <div class="dropdown pull-left">
+          <button class="dropdown-toggle upTreeMenus {% if not counteredPoints %} disabled {% endif %} "
+          id="counteredByMeToggle" data-toggle="dropdown">
+           {% if counteredPoints %}
+              Countering {{ counteredPoints|length }} point{% if counteredPoints|length != 1 %}s{% endif %}
+              <span class="caret"></span>            
+           {% else %} 
+              Countering 0 points
+           {% endif %} 
+          </button>
+          <ul class="dropdown-menu" role="menu" aria-labelledby="counteredByMeMenu">
+                {% for cnPoint in counteredPoints %}
+                    <li><a tabindex="-1"
+                    alt="View {{ cnPoint.title|escape }}"
+                    href="/point/{{ cnPoint.url }}">{{cnPoint.title|escape}}</a></li>
+                {% endfor %}
+            </ul>
+        </div>
+            
+        <div id="pointArea" class="boxedElement span12 dropShadow">
+          <div class="row-fluid">
+            <div id="scoreAndVotingSection" class="span2 pagination-centered">
+              <div class="row-fluid" id="wellWritten">Well written?</div>
+              <div class="row-fluid">       
+                <div id="blueRibbon" class="span6"
+                    data-ribbonvalue="{{ribbonValue|lower}}">
+                  <a class="{% if ribbonValue %} awarded {% else %} notAwarded {% endif %}"
+                    alt="Award Ribbon" src="/static/img/blueribbon.png"> </a>   
+                </div>                                                      
+                <div id="ribbonTotal" class="span6">{{point.ribbonTotal}}</div>
+              </div>
+        
+              <div id="bigScore" class="{% if point.voteTotal >= thresholds.green %}
+              			greenScore
+              		{% else %}
+              			{% if point.voteTotal <= thresholds.red %}
+              				redScore
+              			{% else %}
+              				yellowScore
+              			{% endif %}
+              		{% endif %} hugeScore">
+              	{{ point.voteTotal }}
+              </div>      
+              <div id="upVote" class= "voteArea upArrow whiteScoreText {% if voteValue == 1 %} greenVote {% else %} inactiveVote {% endif %}" >
+                <a alt="UpVote" >{{point.upVotes}}</a> AGREE
+              </div>
+              <div id="downVote" class= "voteArea downArrow whiteScoreText {% if voteValue == -1 %} redVote {% else %} inactiveVote {% endif %}" >
+                <a alt="DownVote">{{point.downVotes}}</a> DISAGREE
+              </div>                      
+              <div id="voteLabel" class="columnHeading">
+                  {% if voteValue == -1 %} 
+                      You Disagree 
+                  {% else %} 
+                      {% if voteValue == 1 %}
+                         You Agree
+                      {% else %}
+                         You Abstain
+                      {% endif %}
+                  {% endif %}                    
+              </div>                                
+            </div>
+            <div id="pointSummary" data-nodetype='{{point.nodetype}}' class="span7">
+                      <h1 class="condensed">{{point.nodetype}}<div class="mainPointTitle editable">{{ point.title|escape }}</div></h1>
+      				<div class="mainPointContent editable">{{ point.content|safe }}</div>
+                      <!-- Hacky way to get imageurl into the edit dialog. :/ -->
+                      <div class="mainPointImageURL" style="display: none">{{point.imageURL}}</div>
+                      {% include 'sources.html' %}
+      
+            </div>      
+            <div id="mainPointImageArea" class="span3">
+                  {% if point.imageURL and point.imageURL.strip %}
+                    <img class="pointDisplay" src="{{ point.fullPointImage }}" />
+                    <div class="mainPointImageCaption">{{point.imageDescription}}</div>
+                    <div class="mainPointImageAuthor">{{point.imageAuthor}}</div>
+                    <button class="mainPointButton" id="changeImage">Change Image</button>
+                  {% else %}
+                    <img class="pointDisplay" src="/static/img/placeholder.gif" />
+                    <div class="mainPointImageCaption">{{point.imageDescription}}</div>
+                    <div class="mainPointImageAuthor">{{point.imageAuthor}}</div>
+                    <button class="mainPointButton" id="addImage">Add an Image</button>
+                  {% endif %}
+            </div>
+          </div>
+          <div id="timestampAndEditLink" class="row-fluid">
+              <div class="mainPointLastEdited span8 offset2">
+                  Last edited {{point.PSTdateEdited}} by <a href='/user/{{point.authorURL}}'>{{ point.authorName }}</a>
+              </div>
+              <div class="span2">
+                <button class="mainPointButton" id="editPoint">
+                  Edit
+                </button>
+              </div>
+           </div>     
+      	  <div class="row-fluid grayBackground" id="pointControlRow">
+  			<div class="span8">
+  			    <button class="mainPointButton tab selectedTab" id="viewSupportingPoints">
+  					Pros and Cons
+  				</button>
+  			    <!-- <button class="mainPointButton tab" id="viewComments">
+  					{{comments|length}} comments
+  				</button> -->
+  	            <button class="mainPointButton tab" id="viewPointHistory">
+  					History
+  				</button>
+  	        </div>
+            <div class="rightMainPointButtons span2">
+              {% if user.admin %}
+                <div class="dropdown">             
+                  <button class="dropdown-toggle mainPointButton" id="pointAdminMenu" data-toggle="dropdown">
+                    Admin
+                  </button>
+                  <ul class="dropdown-menu" role="menu" aria-labelledby="pointAdminMenu">
+                    <li><a tabindex="-1"
+                    alt="Delete Point"
+                    id="deletePoint" onClick="javascript:deletePoint('{{point.url}}');">Delete</a></li>
+                    <li><a href='/job/cleanDeadBacklinks/{{point.url}}'>Root Backlink Clean</a></li>
+                    <li><a href='/job/reconcileVersionArrays/{{point.url}}'>Version Array Fix</a></li>
+                    <li><a href='/job/addMissingBacklinks/{{point.url}}'>Add Missing Backlinks</a></li>                      
+                  </ul>
                 </div>
-                
-				<div id="bigScore" class="{% if point.voteTotal >= thresholds.green %}
-							greenScore
-						{% else %}
-							{% if point.voteTotal <= thresholds.red %}
-								redScore
-							{% else %}
-								yellowScore
-							{% endif %}
-						{% endif %} hugeScore">
-					{{ point.voteTotal }}</div>
-          
-                <div id="upVote" class= "voteArea upArrow whiteScoreText {% if voteValue == 1 %} greenVote {% else %} inactiveVote {% endif %}" >
-                  <a alt="UpVote" src="/static/img/inverse_up_arrow.png">{{point.upVotes}}</a>
-                </div>
-                <div id="voteLabel" class="columnHeading">vote!</div>
-                <div id="downVote" class= "voteArea downArrow whiteScoreText {% if voteValue == -1 %} redVote {% else %} inactiveVote {% endif %}" >
-                  <a alt="DownVote" src="/static/img/inverse_down_arrow.png">{{point.downVotes}}</a>
-                </div>
+              {% endif %}
+            </div>
+            
+            <div id="sharing" class="span2">
+              <div class="addthis_toolbox addthis_default_style" addthis:url="{{point.url}}" addthis:title="{{point.title}}">
+                <a class="addthis_button_facebook"></a>
+                <a class="addthis_button_twitter"></a>
+                <a class="addthis_button_email"></a>
+                <!-- <a class="addthis_button_print"></a> -->
+                <a class="addthis_button_compact"></a>
+                <!-- <a class="addthis_counter addthis_bubble_style"></a> -->
+              </div>
+            </div>
 
-       </div>
-      <div id="pointSummary" class="span7">
-                <div class="mainPointTitle editable"><h1 class="condensed">{{ point.title|escape }}</h1></div>
-				<div class="mainPointContent editable">{{ point.content|safe }}</div>
-                <!-- Hacky way to get imageurl into the edit dialog. :/ -->
-                <div class="mainPointImageURL" style="display: none">{{point.imageURL}}</div>
-                {% include 'sources.html' %}
-                                    
+      	  </div>
         </div>
-	  <div id="timestampAndEditLink" class="span8">
-			<div class="span1"></div>
-			<div class="mainPointLastEdited">
-				Last edited {{point.dateEdited}} by {{ point.authorName }}
-			</div>
-			<button class="mainPointButton" id="editPoint">
-				edit
-			</button>
       </div>
-      <div id="mainPointImageArea" class="span3">
-            {% if point.imageURL and point.imageURL.strip %}
-              <img class="pointDisplay" src="{{ point.fullPointImage }}" />
-              <div class="mainPointImageCaption">{{point.imageDescription}}</div>
-              <div class="mainPointImageAuthor">{{point.imageAuthor}}</div>
-              <button class="mainPointButton" id="changeImage">change image</button>
-            {% else %}
-              <img class="pointDisplay" src="/static/img/placeholder.gif" />
-              <div class="mainPointImageCaption">{{point.imageDescription}}</div>
-              <div class="mainPointImageAuthor">{{point.imageAuthor}}</div>
-              <button class="mainPointButton" id="addImage">add an image</button>
-            {% endif %}
-        </div>
-	  <div class="row">
-          <div class="grayBackground span12">
-             <div id="sharing">
-                <div class="addthis_toolbox addthis_default_style ">
-                  <a class="addthis_button_preferred_1"></a>
-                  <a class="addthis_button_preferred_2"></a>
-                  <a class="addthis_button_preferred_3"></a>
-                  <a class="addthis_button_preferred_4"></a>
-                  <a class="addthis_button_compact"></a>
-                  <a class="addthis_counter addthis_bubble_style"></a>
+
+        <div id="supportingPointsArea" class="tabbedArea">
+            <div class="row-fluid">
+                <div class="span6">
+                  {% with recentlyViewedPoints as recentlyViewedPoints  %}
+                    {% with supportingPoints as linkedPoints %}
+                    {% with "supporting" as linkType %}
+                        {% include 'linkPointsList.html' %}
+                    {% endwith %}
+                    {% endwith %}
                 </div>
-             </div>
-			 <div class="span1"></div>
-			 <div class="span8">
-			    <button class="mainPointButton tab selectedTab" id="viewSupportingPoints">
-					connections
-				</button>
-			    <button class="mainPointButton tab" id="viewComments">
-					comments
-				</button>
-	            <button class="mainPointButton tab" id="viewPointHistory">
-					history
-				</button>
-	         </div>
-			 <div class="rightMainPointButtons span2">
-	           {% if user.admin %}
-	             <button class="mainPointButton" id="deletePoint" onClick="javascript:deletePoint('{{point.url}}');">delete</button>
-	           {% endif %}
-		    </div>
-		  </div>
-	  </div>
-	</div>
+                <div class="span6">
+                    {% with counterPoints as linkedPoints %}
+                    {% with "counter" as linkType %}
+                        {% include 'linkPointsList.html' %}
+                    {% endwith %}
+                    {% endwith %}
+                  {% endwith %}
+                </div>
+          </div>
+    
+        </div> <!-- id="supportingPointsArea" class="tabbedArea"-->
+
+
+      <div id="historyArea" class="row-fluid tabbedArea"> </div>
   </div>
-
-
-  <div id="supportingPointsArea" class="tabbedArea">
-        <div class="row">
-            <div class="span6">
-              {% with recentlyViewedPoints as recentlyViewedPoints  %}
-                {% with supportingPoints as linkedPoints %}
-                {% with "supporting" as linkType %}
-                    {% include 'linkPointsList.html' %}
-                {% endwith %}
-                {% endwith %}
+  
+  
+    <div id="commentColumn" class="span4">
+        <div class="row-fluid">
+            <div class="row-fluid">
+                <div class="span6 columnHeading" id="commentCount">
+                    
+                    {{comments|length}} comment{% if comments|length != 1 %}s{%endif%}
+                </div>
+                <div class="span6">
+                    <button id="showAddComment" class="upTreeMenus pull-right">New Comment </button>                
+                </div>
             </div>
-            <div class="span6">
-                {% with counterPoints as linkedPoints %}
-                {% with "counter" as linkType %}
-                    {% include 'linkPointsList.html' %}
-                {% endwith %}
-                {% endwith %}
-              {% endwith %}
-            </div>
-      </div>
-
-    </div> <!-- id="supportingPointsArea" class="tabbedArea"-->
-
-  <div id="disqus_thread" class="row tabbedArea">
-    		<script type="text/javascript">
-    		    /* * * CONFIGURATION VARIABLES: EDIT BEFORE PASTING INTO YOUR WEBPAGE * * */
-    		    var disqus_shortname = 'whysaurus-beta'; // required: replace example with your forum shortname
-    			var disqus_developer = {{devInt}};
-    			var disqus_identifier = '{{point.url}}';
-    			var disqus_title = '{{point.title}}';
-
-    		    /* * * DON'T EDIT BELOW THIS LINE * * */
-    		    (function() {
-    		        var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
-    		        dsq.src = 'http://' + disqus_shortname + '.disqus.com/embed.js';
-    		        (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
-    		    })();
-    		</script>
-
-    		<noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
-    		<a href="http://disqus.com" class="dsq-brlink">blog comments powered by <span class="logo-disqus">Disqus</span></a>
-
+          
+            <div class="row-fluid">              
+              <div id="addComment" class="hide">
+                      <textarea id="commentText" width="100%"
+                       class="mceEditor textEdit" rows="3"                       
+                       placeholder="Type your comment here..."></textarea>
+                      <input id="rootUrlSafe" type="hidden" name="p" value="{{pointRoot.key.urlsafe}}" />            
+                    <div class="">
+                      <button id='saveCommentSubmit' class="pull-right">Save Comment</button>
+                    </div>
+               </div>
+             </div>
+               <div id="comments">     
+               {% for comment in comments %}
+                  <div class="row-fluid cmmnt level{{comment.level}}">
+                    <div class="cmmnt-content span11">
+                      {{comment.text|safe}}
+                      <a href="/user/{{comment.userUrl}}" class="userlink">{{comment.userName}}</a> 
+                        - <span class="pubdate">{{comment.PSTdate}}</span>
+                    </div>
+                    <div class="span1">
+                        <a name="commentReply" data-parentkey="{{comment.key.urlsafe}}">Reply</a>
+                    </div>
+                  </div>
+               {% endfor %}
+               </div>   
+        </div>       
     </div>
+  
+  </div> <!--  MAIN ROW -->
 
-  <div id="historyArea" class="row tabbedArea">
-    </div>
-
-
-      <script>
-      var myVote = '{{voteValue}}';
-      var pointURL = '{{point.url}}';
-      var thresholdGreen = {{ thresholds.green }};
-      var thresholdRed = {{ thresholds.red }};
-      </script>
+  <script>
+    var myVote = '{{voteValue}}';
+    var pointURL = '{{point.url}}';
+    var thresholdGreen = {{ thresholds.green }};
+    var thresholdRed = {{ thresholds.red }};
+  </script>      
+    
 {% endblock %}
