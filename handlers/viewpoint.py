@@ -1,6 +1,7 @@
 import os
 import constants
 import logging
+import json
 
 from google.appengine.ext.webapp import template
 from authhandler import AuthHandler
@@ -9,8 +10,8 @@ from models.redirecturl import RedirectURL
 
 class ViewPoint(AuthHandler):
     def createTemplateValues(self, point, pointRoot):
-        supportingPoints = point.getSupportingPoints()
-        counterPoints = point.getCounterPoints()
+        supportingPoints = point.getLinkedPoints('supporting')
+        counterPoints = point.getLinkedPoints('counter')
         sources = point.getSources()
 
         user = self.current_user
@@ -41,6 +42,7 @@ class ViewPoint(AuthHandler):
             'counterPoints': counterPoints,
             'supportedPoints':pointRoot.getBacklinkPoints("supporting"),
             'counteredPoints':pointRoot.getBacklinkPoints("counter"),
+            'parentPoints':pointRoot.getBacklinkPoints("child"),
             'comments':pointRoot.getComments(),
             'sources': sources,
             'user': user,
@@ -48,9 +50,35 @@ class ViewPoint(AuthHandler):
             'ribbonValue': ribbonValue,
             'notifications': user.notifications if user else None,
             'thresholds': constants.SCORETHRESHOLDS,
+            'nodetype': 'Point', # This is the nodetype to add in the default view
             'currentArea':self.session.get('currentArea')
         }
         return template_values
+    
+    def getChildPoints(self):
+        url = self.request.get('pointUrl')
+        nodetype = self.request.get('nodeType')
+        point, pointRoot = Point.getCurrentByUrl(url)
+        if point:
+            childPoints = point.getChildPoints(nodetype)
+            user = self.current_user
+            if user:
+                recentlyViewed = user.getRecentlyViewed(excludeList=[point.key.parent()] + 
+                                                        point.childPointsRoots,
+                                                        limitByType=nodetype)
+            tv = {
+                'linkedPoints': childPoints,
+                'linkTitle': nodetype + 's', 
+                'linkType': 'child',
+                'nodetype': nodetype,
+                'recentlyViewedPoints':recentlyViewed
+            }
+            html = template.render('templates/childPointsList.html', tv)
+            resultJSON = json.dumps(html) 
+            self.response.headers.add_header('content-type', 'application/json', charset='utf-8')
+            self.response.out.write(resultJSON)
+        
+        
     def outputTemplateValues(self, template_values):
         path = os.path.join(constants.ROOT, 'templates/point.html')
         self.response.headers["Pragma"]="no-cache"

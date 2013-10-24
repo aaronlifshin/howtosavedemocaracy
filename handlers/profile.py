@@ -20,14 +20,6 @@ class Profile(AuthHandler):
         template_values = {
             'user': self.current_user,
             'profileUser': profileUser,
-<<<<<<< HEAD
-            'viewingOwnPage': viewingOwnPage,
-            'createdPoints' : profileUser.getCreated(),
-            'editedPoints': profileUser.getEdited(),
-            'recentlyViewed': profileUser.getRecentlyViewed(),
-            'currentArea':self.session.get('currentArea')
-        }
-=======
             'viewingOwnPage': viewingOwnPage,            
             'createdPoints' : profileUser.getCreated(),
             'editedPoints': profileUser.getEdited(),
@@ -36,9 +28,6 @@ class Profile(AuthHandler):
         if viewingOwnPage:
             template_values['recentlyViewed'] = profileUser.getRecentlyViewed()
             template_values['notifications'] = Notification.getAllNotificationsForUser(profileUser.key)
-
-
->>>>>>> 3ffa1078d80101291b29c792760ecbd182757f26
         return template_values
 
     def post(self, userURL):

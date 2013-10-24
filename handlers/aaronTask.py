@@ -103,18 +103,11 @@ class AaronTask(AuthHandler):
             logging.info('Requeing MakeFollows task to start at url %s ' % nextURL)
         
     def get(self):
-<<<<<<< HEAD
-=======
 
->>>>>>> 3ffa1078d80101291b29c792760ecbd182757f26
         """
         # ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
         TEST USERS
         # ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ 
-<<<<<<< HEAD
-        """        
-=======
->>>>>>> 3ffa1078d80101291b29c792760ecbd182757f26
         query = WhysaurusUser.query()
         bigMessage = []
         for yUser in query.iter():
@@ -127,10 +120,6 @@ class AaronTask(AuthHandler):
         self.response.out.write(template.render(path, template_values))   
         
             
-<<<<<<< HEAD
-        """
-=======
->>>>>>> 3ffa1078d80101291b29c792760ecbd182757f26
         # ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
         FILL EDITED AND CREATED ARRAYS ON USERS
         # ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ 

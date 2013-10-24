@@ -47,6 +47,24 @@
                 {% endfor %}
             </ul>
         </div>
+        <div class="dropdown pull-left">
+          <button class="dropdown-toggle upTreeMenus {% if not parentPoints %} disabled {% endif %} "
+          id="parentToggle" data-toggle="dropdown">
+           {% if parentPoints %}
+               {{ parentPoints|length }} Related point{% if parentPoints|length != 1 %}s{% endif %}
+              <span class="caret"></span>            
+           {% else %} 
+               0 Related
+           {% endif %} 
+          </button>
+          <ul class="dropdown-menu" role="menu" aria-labelledby="relatedMeMenu">
+                {% for cnPoint in parentPoints %}
+                    <li><a tabindex="-1"
+                    alt="View {{ cnPoint.title|escape }}"
+                    href="/point/{{ cnPoint.url }}">{{cnPoint.title|escape}}</a></li>
+                {% endfor %}
+            </ul>
+        </div>
             
         <div id="pointArea" class="boxedElement span12 dropShadow">
           <div class="row-fluid">
@@ -90,14 +108,11 @@
                   {% endif %}                    
               </div>                                
             </div>
-<<<<<<< HEAD
-            <div id="pointSummary" data-nodetype='{{point.nodetype}}' class="span7">
-                      <h1 class="condensed">{{point.nodetype}}<div class="mainPointTitle editable">{{ point.title|escape }}</div></h1>
-=======
             <div id="pointSummary" class="span7">
+              <div class="label label-success label-{{point.nodetype}} pull-left">{{point.nodetype}}</div>
                       <div class="mainPointTitle editable"><h1 class="condensed">{{ point.title|escape }}</h1></div>
->>>>>>> 3ffa1078d80101291b29c792760ecbd182757f26
-      				<div class="mainPointContent editable">{{ point.content|safe }}</div>
+                      
+      				        <div class="mainPointContent editable">{{ point.content|safe }}</div>
                       <!-- Hacky way to get imageurl into the edit dialog. :/ -->
                       <div class="mainPointImageURL" style="display: none">{{point.imageURL}}</div>
                       {% include 'sources.html' %}
@@ -119,7 +134,8 @@
           </div>
           <div id="timestampAndEditLink" class="row-fluid">
               <div class="mainPointLastEdited span8 offset2">
-                  Last edited {{point.PSTdateEdited}} by <a href='/user/{{point.authorURL}}'>{{ point.authorName }}</a>
+                Most Recent Contributor: <a href='/user/{{point.authorURL}}'>{{ point.authorName }}</a> on {{point.PSTdateEdited}} 
+                <a id="viewPointHistory">View History</a>
               </div>
               <div class="span2">
                 <button class="mainPointButton" id="editPoint">
@@ -127,25 +143,23 @@
                 </button>
               </div>
            </div>     
-<<<<<<< HEAD
       	  <div class="row-fluid grayBackground" id="pointControlRow">
   			<div class="span8">
   			    <button class="mainPointButton tab selectedTab" id="viewSupportingPoints">
-  					Pros and Cons
-=======
-      	  <div class="row-fluid grayBackground">
-  			<div class="span8">
-  			    <button class="mainPointButton tab selectedTab" id="viewSupportingPoints">
-  					Connections
->>>>>>> 3ffa1078d80101291b29c792760ecbd182757f26
-  				</button>
-  			    <!-- <button class="mainPointButton tab" id="viewComments">
-  					{{comments|length}} comments
-  				</button> -->
-  	            <button class="mainPointButton tab" id="viewPointHistory">
-  					History
-  				</button>
-  	        </div>
+  					  Pros and Cons
+  				  </button>
+  				  {% if point.nodetype == "Objective" or point.nodetype == "Organization" %}
+  				  <button class="mainPointButton tab" id="viewChildObjectives">
+  					   Objectives
+  				  </button>
+  				  {% endif %}
+  				  
+  				  {% if point.nodetype == "Objective" or point.nodetype == "Project" or point.nodetype == "Organization" %}
+  				  <button class="mainPointButton tab" id="viewChildProjects">
+  					   Projects
+  				  </button>
+  				  {% endif %}
+        </div>
             <div class="rightMainPointButtons span2">
               {% if user.admin %}
                 <div class="dropdown">             
@@ -201,12 +215,16 @@
     
         </div> <!-- id="supportingPointsArea" class="tabbedArea"-->
 
+      <div id="childObjectivesArea" class="row-fluid tabbedArea"> 
+        
+      </div>
+      <div id="childProjectsArea" class="row-fluid tabbedArea"> 
+        
+      </div>      
+      <div id="historyArea" class="row-fluid tabbedArea"> 
+        
+      </div>
 
-<<<<<<< HEAD
-      <div id="historyArea" class="row-fluid tabbedArea"> </div>
-=======
-      <div id="historyArea" class="row tabbedArea"> </div>
->>>>>>> 3ffa1078d80101291b29c792760ecbd182757f26
   </div>
   
   

@@ -1,10 +1,5 @@
-<<<<<<< HEAD
 application: howtosavedemocracy
 version: 1
-=======
-application: whysaurus
-version: 8
->>>>>>> 3ffa1078d80101291b29c792760ecbd182757f26
 runtime: python27
 api_version: 1
 threadsafe: true
@@ -28,15 +23,12 @@ handlers:
 - url: /job/.*
   script: WhySaurus.app
   login: admin
-  secure: always
   
 - url: /admin
   script: WhySaurus.app
-  secure: always
 
 - url: /.*
   script: WhySaurus.app
-  secure: always
   
 
 libraries:

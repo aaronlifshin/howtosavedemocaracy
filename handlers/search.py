@@ -10,11 +10,7 @@ from models.point import Point
 class Search(AuthHandler):
     def post(self):
         searchString = self.request.get('searchTerms')
-<<<<<<< HEAD
-        searchResults = Point.search(searchString, nodetype=None)
-=======
-        searchResults = Point.search(searchString)
->>>>>>> 3ffa1078d80101291b29c792760ecbd182757f26
+        searchResults = Point.search(searchString, nodeType=None)
         result = len(searchResults) if searchResults else 0
         template_values = {
             'searchResults': searchResults,

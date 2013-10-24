@@ -12,14 +12,14 @@ class AjaxSearch(AuthHandler):
         resultJSON = json.dumps({'result': False})
         searchResults = Point.search(searchTerms=self.request.get('searchTerms'), 
                                      excludeURL=self.request.get('exclude'), 
-                                     linkType=self.request.get('linkType') 
-                                     )
+                                     linkType=self.request.get('linkType'),
+                                     nodeType=self.request.get('nodetype'))
         template_values = {
-            'searchResults': searchResults,
+            'points': searchResults,
             'linkType': self.request.get('linkType'),
             'thresholds': constants.SCORETHRESHOLDS
         }
-        path = os.path.join(constants.ROOT, 'templates/ajaxSearchResults.html')
+        path = os.path.join(constants.ROOT, 'templates/pointBoxList.html')
         resultsHTML = template.render(path, template_values)
         
         if searchResults:

@@ -278,7 +278,7 @@ function submitPointDialog(clickedElement) {
     } else if (dialogAction == "edit") {
         callPointEdit();
     } else if (dialogAction == "createLinked") {
-        var linkType = $(clickedElement).data('linktype');
+        var linkType = $(clickedElement).data('linktype');        
         addPoint(linkType, nodeType);
     }
 }
@@ -785,7 +785,6 @@ $(document).ready(function() {
 
     $('[id^="signInWithTwitter"]').click(function() {
         window.location.href = "/auth/twitter";
-<<<<<<< HEAD
     });
     
     /*window.onload = function() {
@@ -824,8 +823,7 @@ $(document).ready(function() {
     if (!loggedIn) {
         $("#AddNewDropdownToggle").attr('href', "#loginDialog");
         $("#AddNewDropdownToggle").attr('data-toggle', "modal");
-=======
-    });
+    }
     
     /*window.onload = function() {
         positionEditDialog();
@@ -867,7 +865,6 @@ $(document).ready(function() {
     if (!loggedIn) {
         $("#CreatePoint").attr('href', "#loginDialog");
         $("#CreatePoint").attr('data-toggle', "modal");
->>>>>>> 3ffa1078d80101291b29c792760ecbd182757f26
         $("#loginWithEmail").on('click', function() {
             $("#emailLoginDialog").modal('show');
         });
@@ -891,7 +888,6 @@ $(document).ready(function() {
         $('#forgot_emailLoginDialog').click( forgotPassword );        
                                   
     } else {
-<<<<<<< HEAD
         $( "#NewProject" ).on('click', function() {
             $("#submit_pointDialog").data("dialogaction", "new");
             $("#submit_pointDialog").data("nodetype", "Project");
@@ -913,14 +909,12 @@ $(document).ready(function() {
             $("#pointDialog").modal('show');
         });
         
-=======
         $( "#CreatePoint" ).on('click', function() {
             $("#submit_pointDialog").data("dialogaction", "new");
             $('div.modal-header h3', $('#pointDialog')).text("New Point");
             $("#pointDialog").modal('show');
         });
 
->>>>>>> 3ffa1078d80101291b29c792760ecbd182757f26
         $("#pointDialog").on('hidden', function() {
           var edSummary = tinyMCE.get('editor_pointDialog');
           edSummary.setContent('');

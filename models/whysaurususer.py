@@ -44,10 +44,6 @@ class WhysaurusUser(auth_models.User):
     # googleProfileLink =  ndb.StringProperty()
     # twitterProfileLink =  ndb.StringProperty()
 
-<<<<<<< HEAD
-
-=======
->>>>>>> 3ffa1078d80101291b29c792760ecbd182757f26
     @property
     def PSTupdated(self):
         return PST.convert(self.updated)
@@ -66,7 +62,6 @@ class WhysaurusUser(auth_models.User):
     def filterKeylistByCurrentNamespace(self, keylist):        
         currentNamespace = namespace_manager.get_namespace()        
         return filter(lambda key: key.namespace() == currentNamespace, keylist)            
-<<<<<<< HEAD
 
     def set_password(self, raw_password):
         """Sets the password for the current user
@@ -76,17 +71,6 @@ class WhysaurusUser(auth_models.User):
         """
         self.password = security.generate_password_hash(raw_password, length=12)
 
-=======
-
-    def set_password(self, raw_password):
-        """Sets the password for the current user
-        
-        :param raw_password:
-            The raw password which will be hashed and stored
-        """
-        self.password = security.generate_password_hash(raw_password, length=12)
-
->>>>>>> 3ffa1078d80101291b29c792760ecbd182757f26
     def resetPassword(self):
         randomPassword = WhysaurusUser.random_password(8)
         self.set_password(randomPassword)

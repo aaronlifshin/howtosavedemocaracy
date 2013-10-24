@@ -283,10 +283,7 @@ class AuthHandler(WhysaurusRequestHandler, SimpleAuthHandler):
             # user.put()
             self.auth.set_session(self.auth.store.user_to_dict(user))
             self.current_user = user
-<<<<<<< HEAD
-=======
             user.login()
->>>>>>> 3ffa1078d80101291b29c792760ecbd182757f26
             if user.privateArea and user.privateArea is not None:
                 self.setUserArea(usePrivate=True)
         else:

@@ -17,10 +17,7 @@ class NewPoint(AuthHandler):
                 sourcesNames=json.loads(self.request.get('sourcesNames')) if self.request.get('sourcesNames') else None
                 newPoint, newPointRoot = Point.create(
                     title=self.request.get('title'),
-<<<<<<< HEAD
                     nodetype=self.request.get('nodetype'),                 
-=======
->>>>>>> 3ffa1078d80101291b29c792760ecbd182757f26
                     content=self.request.get('content'),
                     summaryText=self.request.get('plainText'),
                     user=user,

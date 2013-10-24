@@ -63,17 +63,3 @@ from profile import Profile
 from adminPage import AdminPage
 from comments import Comments
 from notificationHandler import NotificationHandler
-
-
-
-
-
-
-
-<<<<<<< HEAD
-=======
-
-
->>>>>>> 3ffa1078d80101291b29c792760ecbd182757f26
-
-

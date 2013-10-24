@@ -21,10 +21,7 @@ class MainPage(AuthHandler):
             recentlyViewedPoints = user.getRecentlyViewed()
         else:
             recentlyViewedPoints = []
-<<<<<<< HEAD
 
-=======
->>>>>>> 3ffa1078d80101291b29c792760ecbd182757f26
         template_values = {
             'recentlyActive': newPoints,
             'recentlyViewed': recentlyViewedPoints,

@@ -23,9 +23,8 @@
           <div class="span2">
             <a href="/"><img class="pull-left" id="logoImage" src="/static/img/h2sdlogo.png"/></a>
           </div>
-<<<<<<< HEAD
           <div id="addNewMenu" class="span2 headerLinks">
-            <a id="AddNewDropdownToggle" class="userControls dropdown-toggle" data-toggle="dropdown"  href="/user/{{ user.url}}">ADD NEW  </a>
+            <a id="AddNewDropdownToggle" class="userControls dropdown-toggle" data-toggle="dropdown">ADD NEW  </a>
             {% if user %}
               <ul class="dropdown-menu" role="menu" aria-labelledby="dropdownMenu">
                 <li><a tabindex="-1" id="NewProject"> Project </a></li>                   
@@ -34,10 +33,6 @@
               </ul>
             {% endif %}
             <span class="caret vertalignmiddle"></span>            
-=======
-          <div class="span2">
-            <a id="CreatePoint" class="pull-left" alt="Make a Point" src="/static/img/button_makeAPoint_grey_118.png"></a>
->>>>>>> 3ffa1078d80101291b29c792760ecbd182757f26
           </div>
           <div id="searchArea" class="span4">
               <input id="searchBox" type="text" name="searchTerms" placeholder="Find Points..." results="0" />
@@ -118,7 +113,7 @@
           		    <li><a tabindex="-1" href="/auth/facebook"> Facebook </a></li>
           		    <li><a tabindex="-1" href="/auth/google"> Google </a></li>
                     <li><a tabindex="-1" href="/auth/twitter"> Twitter </a></li>
-                    <li><a tabindex="-1" id="loginWithEmail"> Whysaurus </a></li>                    
+                    <li><a tabindex="-1" id="loginWithEmail"> Local </a></li>                    
                   </ul>
                 </div>
     		  {% endif %}
@@ -202,7 +197,7 @@
                 <label class="control-label" for="signup_userEmail">Email Address</label>
                 <div class="controls">            
                     <input id="signup_userEmail" name="signup_userEmail" type="text"
-                    placeholder="Use to login and receive Whysaurus notifications."></input>
+                    placeholder="Use to login and receive notifications."></input>
                 </div>
               </div>  
               <div class="control-group">            
@@ -265,7 +260,7 @@
           <div id="signInWithFacebook_Dlg" class="boxedElement"><a tabindex="1" href="/auth/facebook"> Sign in with Facebook </a></div>
           <div id="signInWithGoogle_Dlg" class="boxedElement"><a tabindex="2" href="/auth/google"> Sign in with Google </a></div>
           <div id="signInWithTwitter_Dlg" class="boxedElement"><a tabindex="3" href="/auth/twitter"> Sign in with Twitter </a></div>
-          <div id="signInWithEmail_Dlg" class="boxedElement"><a tabindex="4" href="#"> Sign in with Whysaurus </a></div>
+          <div id="signInWithEmail_Dlg" class="boxedElement"><a tabindex="4" href="#"> Sign in locally </a></div>
           
         </div>
         <div class="modal-footer">
