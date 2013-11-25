@@ -62,6 +62,7 @@ class ViewPoint(AuthHandler):
         if point:
             childPoints = point.getChildPoints(nodetype)
             user = self.current_user
+            recentlyViewed = None
             if user:
                 recentlyViewed = user.getRecentlyViewed(excludeList=[point.key.parent()] + 
                                                         point.childPointsRoots,
