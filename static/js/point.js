@@ -725,6 +725,44 @@ function ajaxLoadTabbedArea(tabButtonControl, tabbedAreaSelector, ajaxURL, data,
 	});
 }
 
+function changeEditorsPick() {
+    pick = $('#editorsPick').get(0).checked;
+    pickSort = $("#editorsPickSort").val();
+    if (pick && !isNormalInteger(pickSort)) {
+        showAlertAfter('Editors Pick must have a positive whole number for Editors Pick Sort', '#changeEditorsPick [name="alertArea"]');
+    } else {
+        startSpinnerOnButton('#submitChangeEditorsPick');        
+        $.ajaxSetup({
+    		url: "/changeEditorsPick",
+    		global: false,
+    		type: "POST",
+    		data: {
+    			'urlToEdit': $('#pointArea').data('pointurl'),
+    			'editorsPick': pick,
+    			'editorsPickSort': pickSort
+    		},
+    		success: function(data) {
+		    	obj = JSON.parse(data);
+    			if (obj.result == true) {
+    		        // set the values in the main point page
+        		    if (pick) {
+        		        $('#changeEditorsPickTrigger').text('Editors Pick: True - ' + pickSort);  		        		        
+        		    } else {
+        		        $('#changeEditorsPickTrigger').text('Editors Pick: False');         		        
+        		    }
+        		    stopSpinnerOnButton('#submitChangeEditorsPick', changeEditorsPick);
+        		    $('#changeEditorsPick').modal('hide');
+        		    showSuccessAlert('Editors Picks updated.')    		    
+        		} else {
+        		    showAlertAfter('Server error: ' + obj.error + '. You may try again.', '#changeEditorsPick [name="alertArea"]');                    
+        		    stopSpinnerOnButton('#submitChangeEditorsPick', changeEditorsPick);          		    
+        		}        		          
+    		},    		
+    	});
+    	$.ajax();
+    }
+}
+
 $(document).ready(function() {
 
     if (!loggedIn) {
@@ -816,5 +854,14 @@ $(document).ready(function() {
         ajaxLoadTabbedArea(this, '#childProjectsArea', '/getChildPoints', 
             { 'pointUrl': pointURL, 'nodeType': 'Project' }, 'projects');        
     });
+	
+    // These elements are admin only, but jquery degrades gracefully, so not checking for their presence
+    $('#changeEditorsPickTrigger').on('click', function() {
+        title = $('#pointSummary div.mainPointTitle').text();
+        $("#changeEditorsPick .modal-header h4").text(title);
+        $("#changeEditorsPick").modal('show');
+    }); 
+    
+    $('#submitChangeEditorsPick').on('click', changeEditorsPick);    
     
 });

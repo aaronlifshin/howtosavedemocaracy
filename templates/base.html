@@ -144,6 +144,9 @@
 
     {% if user %}
         {% include 'pointDialog.html' %}
+        {% if user.admin %}
+          {% include 'changeEditorsPick.html' %}
+        {% endif %}
     {% else %}
       <div class="modal hide fade" data-keyboard="true" id="emailLoginDialog" role="dialog" aria-hidden="true">
          <form id='frm_emailLoginDialog' class="form-horizontal" action="/login" method="POST">          

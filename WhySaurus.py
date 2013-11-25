@@ -84,7 +84,8 @@ routes = [
     Route('/<type:v|p>/<user_id:\d+>-<signup_token:.+>',
                   handler='WhySaurus.AuthHandler:verify', name='verification'),
     Route('/auth/<provider>', handler='WhySaurus.AuthHandler:_simple_auth', name='auth_login'),
-    Route('/auth/<provider>/callback', handler='WhySaurus.AuthHandler:_auth_callback', name='auth_callback')
+    Route('/auth/<provider>/callback', handler='WhySaurus.AuthHandler:_auth_callback', name='auth_callback'),
+    Route('/changeEditorsPick', handler='WhySaurus.EditPoint:changeEditorsPick', name='changeEditorsPick')  
 ]
 
 # webapp2 config

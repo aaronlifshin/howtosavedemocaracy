@@ -66,7 +66,7 @@
             </ul>
         </div>
             
-        <div id="pointArea" class="boxedElement span12 dropShadow">
+        <div id="pointArea" class="boxedElement span12 dropShadow" data-pointurl="{{point.url}}">
           <div class="row-fluid">
             <div id="scoreAndVotingSection" class="span2 pagination-centered">
               <div class="row-fluid" id="wellWritten">Well written?</div>
@@ -172,7 +172,11 @@
                     id="deletePoint" onClick="javascript:deletePoint('{{point.url}}');">Delete</a></li>
                     <li><a href='/job/cleanDeadBacklinks/{{point.url}}'>Root Backlink Clean</a></li>
                     <li><a href='/job/reconcileVersionArrays/{{point.url}}'>Version Array Fix</a></li>
-                    <li><a href='/job/addMissingBacklinks/{{point.url}}'>Add Missing Backlinks</a></li>                      
+                    <li><a href='/job/addMissingBacklinks/{{point.url}}'>Add Missing Backlinks</a></li>                      	           <li><a id='changeEditorsPickTrigger'>
+	             	   Editors Pick: 
+				 		{{pointRoot.editorsPick}}{%if pointRoot.editorsPick %} - {{pointRoot.editorsPickSort}} {% endif %}
+	            	 	</a>
+	         	   	</li>     
                   </ul>
                 </div>
               {% endif %}

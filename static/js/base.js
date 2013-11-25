@@ -39,8 +39,13 @@ function stopSpinnerOnButton(buttonID, clickHandler) {
    $("#spinnerImage").remove();
    $(buttonID).click( clickHandler );        
    $(buttonID).show();
-}
+}   
    
+function isNormalInteger(str) {
+   var n = ~~Number(str);
+   return String(n) === str && n >= 0;
+}
+     
 function post_to_url(path, params, method) {
   method = method || "post"; // Set method to post by default, if not specified.
 

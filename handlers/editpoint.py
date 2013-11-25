@@ -47,3 +47,25 @@ class EditPoint(AuthHandler):
             })
         self.response.headers.add_header('content-type', 'application/json', charset='utf-8')
         self.response.out.write(resultJSON)
+        
+        
+    def changeEditorsPick(self):
+        result = {'result': False}
+        try:
+            if self.current_user and self.current_user.admin:
+                point, pointRoot = Point.getCurrentByUrl(self.request.get('urlToEdit'))
+                if pointRoot is None:
+                    result['error'] = 'Not able to find point by URL'
+                else:
+                    pick = True if self.request.get('editorsPick') == 'true' else False
+                    if pointRoot.updateEditorsPick(pick, 
+                                                   int(self.request.get('editorsPickSort'))):
+                        result = {'result': True}
+            else:
+                result = {'result': False, 'error': 'Permission denied!'}
+        except Exception as e:
+            result = {'result': False, 'error': str(e)}
+    
+        resultJSON = json.dumps(result)    
+        self.response.headers.add_header('content-type', 'application/json', charset='utf-8')
+        self.response.out.write(resultJSON)

@@ -953,6 +953,12 @@ class PointRoot(ndb.Model):
         else:
             self.comments = [comment.key]
         self.put()
+        
+    def updateEditorsPick(self, editorsPick, editorsPickSort):
+        self.editorsPick = editorsPick
+        self.editorsPickSort = editorsPickSort
+        self.put()
+        return True
     
 # A dummy class to create an entity group
 # For large groups this will cause issues with sharding them across datastore nodes
