@@ -156,45 +156,46 @@ function updateVoteButtonLabels(newVote){
     var upvoteLabel = $( "#upVote a" ).text();
     var bigScore = $( "#bigScore" ).text();
 
+	// Numbers are currently not displayed
     if (myVote == 0 && newVote == 1) {// UPVOTE
-        var newVal = parseInt(upvoteLabel) + 1;
-        $( "#upVote a" ).text(newVal.toString());
-        $( "#bigScore" ).text(parseInt(bigScore) + 1);
-        $("#voteLabel").text("You agree");
+        // var newVal = parseInt(upvoteLabel) + 1;
+        // $( "#upVote a" ).text(newVal.toString());
+        // $( "#bigScore" ).text(parseInt(bigScore) + 1);
+        // $("#voteLabel").text("You agree");
         upVoteToggle(true);
     } else if (myVote == 0 && newVote == -1) { // DOWNVOTE
-        var newVal = parseInt(downvoteLabel) + 1;
-        $( "#downVote a" ).text(newVal.toString());
-        $( "#bigScore" ).text(parseInt(bigScore) - 1);
-        $("#voteLabel").text("You disagree");        
+        // var newVal = parseInt(downvoteLabel) + 1;
+        // $( "#downVote a" ).text(newVal.toString());
+        // $( "#bigScore" ).text(parseInt(bigScore) - 1);
+        // $("#voteLabel").text("You disagree");        
         downVoteToggle(true);
     } else if (myVote == 1  &&  newVote == 0) { // CANCEL UPVOTE
-        var newVal = parseInt(upvoteLabel) - 1;
-        $( "#upVote a" ).text(newVal.toString());
-        $( "#bigScore" ).text(parseInt(bigScore) - 1);
-        $("#voteLabel").text("You abstain");                
+        // var newVal = parseInt(upvoteLabel) - 1;
+        // $( "#upVote a" ).text(newVal.toString());
+        // $( "#bigScore" ).text(parseInt(bigScore) - 1);
+        // $("#voteLabel").text("You abstain");                
         upVoteToggle(false);
     } else if (myVote == -1  &&  newVote == 0) { // CANCEL DOWNVOTE
-        var newVal = parseInt(downvoteLabel) - 1;
-        $( "#downVote a" ).text(newVal.toString());
-        $( "#bigScore" ).text(parseInt(bigScore) + 1);
-        $("#voteLabel").text("You abstain");                
+        // var newVal = parseInt(downvoteLabel) - 1;
+        // $( "#downVote a" ).text(newVal.toString());
+        // $( "#bigScore" ).text(parseInt(bigScore) + 1);
+        // $("#voteLabel").text("You abstain");                
         downVoteToggle(false);
     } else if (myVote == -1  &&  newVote == 1) { // DOWN TO UP
-        var newVal = parseInt(downvoteLabel) - 1;
-        $( "#downVote a" ).text(newVal.toString());
-        var newVal = parseInt(upvoteLabel) + 1;
-        $( "#upVote a" ).text(newVal.toString());
-        $( "#bigScore" ).text(parseInt(bigScore) + 2);
-        $("#voteLabel").text("You agree");        
+        // var newVal = parseInt(downvoteLabel) - 1;
+        // $( "#downVote a" ).text(newVal.toString());
+        // var newVal = parseInt(upvoteLabel) + 1;
+        // $( "#upVote a" ).text(newVal.toString());
+        // $( "#bigScore" ).text(parseInt(bigScore) + 2);
+        // $("#voteLabel").text("You agree");        
         downVoteToggle(false);
         upVoteToggle(true);
     } else if (myVote == 1  &&  newVote == -1) {// UP TO DOWN
         var newVal = parseInt(downvoteLabel) + 1;
-        $( "#downVote a" ).text(newVal.toString());
-        var newVal = parseInt(upvoteLabel) - 1;
-        $( "#upVote a" ).text(newVal.toString());
-        $( "#bigScore" ).text(parseInt(bigScore) - 2);
+        // $( "#downVote a" ).text(newVal.toString());
+        // var newVal = parseInt(upvoteLabel) - 1;
+        // $( "#upVote a" ).text(newVal.toString());
+        // $( "#bigScore" ).text(parseInt(bigScore) - 2);
         $("#voteLabel").text("You disagree");                
         upVoteToggle(false);
         downVoteToggle(true);
