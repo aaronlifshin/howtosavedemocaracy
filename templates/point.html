@@ -1,5 +1,7 @@
 {% extends "base.html" %}
 
+        <!--{{point.upVotes}} {{point.downVotes}}-->
+
 {% block mainPageContent %}
   <script type="text/javascript" src="/static/js/point.js"></script>
   
@@ -13,7 +15,7 @@
     <div class="span8">
       <div class="row-fluid">
         <div class="dropdown pull-left">
-            <button class="dropdown-toggle upTreeMenus {% if not supportedPoints %} disabled {% endif %}" id="supportedByMeMenu" data-toggle="dropdown">
+            <button class="dropdown-toggle upTreeMenus firstUpTree {% if not supportedPoints %} disabled {% endif %}" id="supportedByMeMenu" data-toggle="dropdown">
              {% if supportedPoints %}
                 Supporting {{ supportedPoints|length }} point{% if supportedPoints|length != 1 %}s{% endif %}    
                 <span class="caret"></span>              
@@ -48,7 +50,7 @@
             </ul>
         </div>
         <div class="dropdown pull-left">
-          <button class="dropdown-toggle upTreeMenus {% if not parentPoints %} disabled {% endif %} "
+          <button class="dropdown-toggle upTreeMenus lastUpTree {% if not parentPoints %} disabled {% endif %} "
           id="parentToggle" data-toggle="dropdown">
            {% if parentPoints %}
                {{ parentPoints|length }} Related point{% if parentPoints|length != 1 %}s{% endif %}
@@ -66,134 +68,164 @@
             </ul>
         </div>
             
-        <div id="pointArea" class="boxedElement span12 dropShadow" data-pointurl="{{point.url}}">
+        <div id="pointArea" class="boxedElement span12" data-pointurl="{{point.url}}">
           <div class="row-fluid">
-            <div id="scoreAndVotingSection" class="span2 pagination-centered">
-              <div class="row-fluid" id="wellWritten">Well written?</div>
-              <div class="row-fluid">       
-                <div id="blueRibbon" class="span6"
-                    data-ribbonvalue="{{ribbonValue|lower}}">
-                  <a class="{% if ribbonValue %} awarded {% else %} notAwarded {% endif %}"
-                    alt="Award Ribbon" src="/static/img/blueribbon.png"> </a>   
-                </div>                                                      
-                <div id="ribbonTotal" class="span6">{{point.ribbonTotal}}</div>
-              </div>
-        
-              <div id="bigScore" class="{% if point.voteTotal >= thresholds.green %}
-              			greenScore
-              		{% else %}
-              			{% if point.voteTotal <= thresholds.red %}
-              				redScore
-              			{% else %}
-              				yellowScore
-              			{% endif %}
-              		{% endif %} hugeScore">
-              	{{ point.voteTotal }}
-              </div>      
-              <div id="upVote" class= "voteArea upArrow whiteScoreText {% if voteValue == 1 %} greenVote {% else %} inactiveVote {% endif %}" >
-                <a alt="UpVote" >{{point.upVotes}}</a> AGREE
-              </div>
-              <div id="downVote" class= "voteArea downArrow whiteScoreText {% if voteValue == -1 %} redVote {% else %} inactiveVote {% endif %}" >
-                <a alt="DownVote">{{point.downVotes}}</a> DISAGREE
-              </div>                      
-              <div id="voteLabel" class="columnHeading">
-                  {% if voteValue == -1 %} 
-                      You Disagree 
-                  {% else %} 
-                      {% if voteValue == 1 %}
-                         You Agree
-                      {% else %}
-                         You Abstain
-                      {% endif %}
-                  {% endif %}                    
-              </div>                                
-            </div>
-            <div id="pointSummary" class="span7">
-              <div class="label label-success label-{{point.nodetype}} pull-left">{{point.nodetype}}</div>
-                      <div class="mainPointTitle editable"><h1 class="condensed">{{ point.title|escape }}</h1></div>
-                      
-      				        <div class="mainPointContent editable">{{ point.content|safe }}</div>
-                      <!-- Hacky way to get imageurl into the edit dialog. :/ -->
-                      <div class="mainPointImageURL" style="display: none">{{point.imageURL}}</div>
-                      {% include 'sources.html' %}
-      
-            </div>      
-            <div id="mainPointImageArea" class="span3">
-                  {% if point.imageURL and point.imageURL.strip %}
-                    <img class="pointDisplay" src="{{ point.fullPointImage }}" />
-                    <div class="mainPointImageCaption">{{point.imageDescription}}</div>
-                    <div class="mainPointImageAuthor">{{point.imageAuthor}}</div>
-                    <button class="mainPointButton" id="changeImage">Change Image</button>
-                  {% else %}
-                    <img class="pointDisplay" src="/static/img/placeholder.gif" />
-                    <div class="mainPointImageCaption">{{point.imageDescription}}</div>
-                    <div class="mainPointImageAuthor">{{point.imageAuthor}}</div>
-                    <button class="mainPointButton" id="addImage">Add an Image</button>
-                  {% endif %}
-            </div>
-          </div>
-          <div id="timestampAndEditLink" class="row-fluid">
-              <div class="mainPointLastEdited span8 offset2">
-                Most Recent Contributor: <a href='/user/{{point.authorURL}}'>{{ point.authorName }}</a> on {{point.PSTdateEdited}} 
-                <a id="viewPointHistory">View History</a>
-              </div>
-              <div class="span2">
-                <button class="mainPointButton" id="editPoint">
-                  Edit
-                </button>
-              </div>
-           </div>     
-      	  <div class="row-fluid grayBackground" id="pointControlRow">
-  			<div class="span8">
-  			    <button class="mainPointButton tab selectedTab" id="viewSupportingPoints">
-  					  Pros and Cons
-  				  </button>
-  				  {% if point.nodetype == "Objective" or point.nodetype == "Organization" %}
-  				  <button class="mainPointButton tab" id="viewChildObjectives">
-  					   Objectives
-  				  </button>
-  				  {% endif %}
-  				  
-  				  {% if point.nodetype == "Objective" or point.nodetype == "Project" or point.nodetype == "Organization" %}
-  				  <button class="mainPointButton tab" id="viewChildProjects">
-  					   Projects
-  				  </button>
-  				  {% endif %}
-        </div>
-            <div class="rightMainPointButtons span2">
-              {% if user.admin %}
-                <div class="dropdown">             
-                  <button class="dropdown-toggle mainPointButton" id="pointAdminMenu" data-toggle="dropdown">
-                    Admin
-                  </button>
-                  <ul class="dropdown-menu" role="menu" aria-labelledby="pointAdminMenu">
-                    <li><a tabindex="-1"
-                    alt="Delete Point"
-                    id="deletePoint" onClick="javascript:deletePoint('{{point.url}}');">Delete</a></li>
-                    <li><a href='/job/cleanDeadBacklinks/{{point.url}}'>Root Backlink Clean</a></li>
-                    <li><a href='/job/reconcileVersionArrays/{{point.url}}'>Version Array Fix</a></li>
-                    <li><a href='/job/addMissingBacklinks/{{point.url}}'>Add Missing Backlinks</a></li>                      	           <li><a id='changeEditorsPickTrigger'>
-	             	   Editors Pick: 
-				 		{{pointRoot.editorsPick}}{%if pointRoot.editorsPick %} - {{pointRoot.editorsPickSort}} {% endif %}
-	            	 	</a>
-	         	   	</li>     
-                  </ul>
+                <div id="pointSummary" class="span9">
+                  <div class="label label-success label-{{point.nodetype}}">{{point.nodetype}}</div>
+                          <div class="mainPointTitle editable"><h1 class="condensed">{{ point.title|escape }}</h1></div>
+
+                                <div class="mainPointContent editable">{{ point.content|safe }}</div>
+                          <!-- Hacky way to get imageurl into the edit dialog. :/ -->
+                          <div class="mainPointImageURL" style="display: none">{{point.imageURL}}</div>
+                          {% include 'sources.html' %}
+
+                    <button class="mainPointButton" id="editPoint">
+                        Edit
+                    </button>
+
                 </div>
-              {% endif %}
-            </div>
-            
-            <div id="sharing" class="span2">
-              <div class="addthis_toolbox addthis_default_style" addthis:url="{{point.url}}" addthis:title="{{point.title}}">
-                <a class="addthis_button_facebook"></a>
-                <a class="addthis_button_twitter"></a>
-                <a class="addthis_button_email"></a>
-                <!-- <a class="addthis_button_print"></a> -->
-                <a class="addthis_button_compact"></a>
-                <!-- <a class="addthis_counter addthis_bubble_style"></a> -->
-              </div>
+                <div id="mainPointImageArea" class="span3">
+                      {% if point.imageURL and point.imageURL.strip %}
+                        <img class="pointDisplay" src="{{ point.fullPointImage }}" />
+                        <div class="mainPointImageCaption">{{point.imageDescription}}</div>
+                        <div class="mainPointImageAuthor">{{point.imageAuthor}}</div>
+                        <button class="mainPointButton" id="changeImage">Change Image</button>
+                      {% else %}
+                        <img class="pointDisplay" src="/static/img/placeholder.gif" />
+                        <div class="mainPointImageCaption">{{point.imageDescription}}</div>
+                        <div class="mainPointImageAuthor">{{point.imageAuthor}}</div>
+                        <button class="mainPointButton" id="addImage">Add an Image</button>
+                      {% endif %}
+                </div>
+          </div>
+<!---->
+
+            <div class="row-fluid">
+                <div id="sharing" class="span3">
+                    <div class="addthis_toolbox addthis_default_style" addthis:url="{{point.url}}" addthis:title="{{point.title}}">
+                        <a class="addthis_button_facebook"></a>
+                        <a class="addthis_button_twitter"></a>
+                        <a class="addthis_button_email"></a>
+                        <!-- <a class="addthis_button_print"></a> -->
+                        <a class="addthis_button_compact"></a>
+                        <!-- <a class="addthis_counter addthis_bubble_style"></a> -->
+                    </div>
+                </div>
+
+                <div id="timestampAndEditLink" class="span9">
+                    <div class="mainPointLastEdited span8">
+                        Most Recent Contributor:<br>
+                        <a href='/user/{{point.authorURL}}'>{{ point.authorName }}</a> on
+                        {{point.PSTdateEdited}}
+                        <!--<a id="viewPointHistory">View History</a>-->
+                    </div>
+                    <div class="span4">
+                    </div>
+                </div>
             </div>
 
-      	  </div>
+            <!--
+            -- JSB: PROS/CONS & PROJECTS
+            --
+            <div class="row-fluid grayBackground" id="pointControlRow">
+                <div class="span8">
+                    <button class="mainPointButton tab selectedTab" id="viewSupportingPoints">
+                        Pros and Cons
+                    </button>
+                    {% if point.nodetype == "Objective" or point.nodetype == "Organization" %}
+                    <button class="mainPointButton tab" id="viewChildObjectives">
+                        Objectives
+                    </button>
+                    {% endif %}
+
+                    {% if point.nodetype == "Objective" or point.nodetype == "Project" or point.nodetype == "Organization" %}
+                    <button class="mainPointButton tab" id="viewChildProjects">
+                        Projects
+                    </button>
+                    {% endif %}
+                </div>
+                <div class="rightMainPointButtons span2">
+                    {% if user.admin %}
+                    <div class="dropdown">
+                        <button class="dropdown-toggle mainPointButton" id="pointAdminMenu" data-toggle="dropdown">
+                            Admin
+                        </button>
+                        <ul class="dropdown-menu" role="menu" aria-labelledby="pointAdminMenu">
+                            <li><a tabindex="-1"
+                                   alt="Delete Point"
+                                   id="deletePoint" onClick="javascript:deletePoint('{{point.url}}');">Delete</a></li>
+                            <li><a href='/job/cleanDeadBacklinks/{{point.url}}'>Root Backlink Clean</a></li>
+                            <li><a href='/job/reconcileVersionArrays/{{point.url}}'>Version Array Fix</a></li>
+                            <li><a href='/job/addMissingBacklinks/{{point.url}}'>Add Missing Backlinks</a></li>                      	           <li><a id='changeEditorsPickTrigger'>
+                            Editors Pick:
+                            {{pointRoot.editorsPick}}{%if pointRoot.editorsPick %} - {{pointRoot.editorsPickSort}} {% endif %}
+                        </a>
+                        </li>
+                        </ul>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+            -->
+
+
+<!---->
+        <div id="scoreAndVotingSection" class="row-fluid">
+            <!--
+             -- JSB: "well written" ribbon
+            <div class="row-fluid" id="wellWritten">Well written?</div>
+            <div class="row-fluid">
+                <div id="blueRibbon" class="span6"
+                     data-ribbonvalue="{{ribbonValue|lower}}">
+                    <a class="{% if ribbonValue %} awarded {% else %} notAwarded {% endif %}"
+                       alt="Award Ribbon" src="/static/img/blueribbon.png"> </a>
+                </div>
+                <div id="ribbonTotal" class="span6">{{point.ribbonTotal}}</div>
+            </div>
+            -->
+
+            <!--
+             -- JSB: "big score" tag
+            <div id="bigScore" class="{% if point.voteTotal >= thresholds.green %}
+                                    greenScore
+                                {% else %}
+                                    {% if point.voteTotal <= thresholds.red %}
+                                        redScore
+                                    {% else %}
+                                        yellowScore
+                                    {% endif %}
+                                {% endif %} hugeScore">
+                {{ point.voteTotal }}
+            </div>
+            -->
+
+            <div id="upVote" class=
+                    "voteArea span6 upArrow {% if voteValue == 1 %} greenVote {%endif %} {% if voteValue == -1 %} inactiveVote {% endif %}" >
+                <a alt="Up Vote" >I AGREE</a>
+            </div>
+            <div id="downVote" class=
+                    "voteArea span6 downArrow {% if voteValue == -1 %} redVote {%endif %} {% if voteValue == 1 %} inactiveVote {% endif %}" >
+                <a alt="Down Vote">I DISAGREE</a>
+            </div>
+            <!--
+             -- JSB: "You agree"
+            <div id="voteLabel" class="columnHeading">
+                {% if voteValue == -1 %}
+                You Disagree
+                {% else %}
+                {% if voteValue == 1 %}
+                You Agree
+                {% else %}
+                You Abstain
+                {% endif %}
+                {% endif %}
+            </div>
+            -->
+        </div>
+
+<!---->
+
+
         </div>
       </div>
 
