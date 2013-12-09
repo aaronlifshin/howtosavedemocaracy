@@ -38,8 +38,8 @@ class Comment(ndb.Model):
             parentComment =  parentCommentKey.get()
             if not parentComment:
                 raise WhysaurusException("Bad parent comment key supplied.")
-            elif parentComment.level >= 8:
-                raise WhysaurusException("9 levels of replies are maximum for now.")
+            elif parentComment.level >= 4:
+                raise WhysaurusException("4 levels of replies are maximum for now.")
 
         if pointRoot:            
             comment = Comment(text=text, userName = user.name, userUrl=user.url, 
