@@ -12,8 +12,9 @@
         {% endif %}            
       </div>
     </div>    
-      <div class="row-fluid">
-          <span class="stat"><img src="/static/img/agreesIconBig.png"/>&nbsp{{ point.voteTotal }}</span>
+
+    <div class="row-fluid statRow">
+          <span class="stat"><img src="/static/img/agreesIconBig.png"/>{{ point.voteTotal }}</span>
           <span class="stat"><img src="/static/img/awardsIconBig.png"/>{{ point.ribbonTotal }}</span>
           <span class="stat"><img src="/static/img/sourcesIconBig.png"/>&nbsp{{ point.sources|length }}</span>
       </div>

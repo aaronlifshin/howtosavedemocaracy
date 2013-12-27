@@ -1,12 +1,13 @@
 @import url(http://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,700,300italic,400italic);
+@import url(http://fonts.googleapis.com/css?family=Yanone+Kaffeesatz);
 
 // mixins
 
 .headerFont() { font-family: 'Source Sans Pro', sans-serif }
 .bodyFont() { font-family: 'Source Sans Pro', sans-serif }
 .condHeaderFont() {
-  font-family: 'Source Sans Pro', sans-serif;
-  font-weight:700;
+  font-family: 'Yanone Kaffeesatz', sans-serif;
+  //font-weight:700;
 }
 @SPACER:16px;
 
@@ -25,7 +26,27 @@ body {
   .bodyFont();
 }
 
-//------
+.boxedElement {   // reusable mixin
+  border: 1px solid #ccc;
+  border-radius: 2px;
+  word-wrap: break-word;
+
+  h5 {
+    padding-left: 5px;
+  }
+}
+
+.hoverShadowBox() {
+  border: 1px solid #ccc;
+  transition:all 0.15s;
+
+  &:hover {
+    box-shadow: 0 0 7px rgba(0,0,0,0.2);
+  }
+}
+
+
+//----------------------------------------------------
 
 .no-space [class*="span"] {
   margin: 0 0 0 0 ;
@@ -226,10 +247,10 @@ body {
 
 .headerLinks {
   size:1.25em;
-  font-family: "nimbus-sans-condensed", sans-serif;
+  //font-family: "nimbus-sans-condensed", sans-serif;
+  .condHeaderFont();
   color:black;
-  font-weight: bold;
-
+  //font-weight: bold;
 }
 
 .headerAboutHelp {
@@ -352,20 +373,81 @@ body {
    END NOTIFICATION AREA IN PROFILE PAGE
    +++++++++++++++++++++++++++++++++++++++++++++++ */
 
+
 .pointCard {
-  border-style:solid;
-  border-width:1px;
-  border-color:#B9BBBD;
+
   word-wrap: break-word;
   cursor:pointer;
-  padding:5px;
+  .hoverShadowBox();
+  padding: 12px;
+  margin: 8px 0;
+  clear: both;
+
+  .pointTitle a {
+    color: #000;
+    font-size: 1.0625em;
+    line-height: 1.3125em;
+  }
+
+  .statRow {
+    margin: 8px 0;
+  }
+
+  .stat {
+    color: #a9a9a9;
+    font-size:1.25em;
+    padding-right:12px;
+
+    img { margin-right: 6px}
+  }
+
+  .linkStat {
+    height:18px;
+    min-height:0px;
+    display:block;
+    float:left;
+  }
+
+  .counterColor {
+    background-color: #ffe6e7;
+  }
+
+  .supportColor {
+    background-color: #e3fde5;
+  }
+
+  .gauge {
+    position:relative;
+  }
+
+  .gaugeText {
+    top:3px;
+    position: absolute;
+    font-size: 1.125em;
+    color: #a9a9a9;
+    //.bodyFont();
+    text-transform:Uppercase;
+  }
+
+  .gaugeCounter {
+    right: 3px;
+  }
+
+  .gaugeSupporting {
+    left: 3px;
+  }
+}
+
+.pointCard .pointTitle a:hover, .pointSmall .smallTitle a:hover {
+  text-decoration:none;
 }
 
 [id$=_pointList] .pointCard {
   position: relative;
 }
 
-.pointCard:hover, .pointSmall:hover, .pointListPoint:hover {
+//.pointCard:hover,
+.pointSmall:hover, .pointListPoint:hover {
   -webkit-box-shadow: -1px 1px 10px rgba(50, 50, 50, 0.75);
   -moz-box-shadow:    -1px 1px 10px rgba(50, 50, 50, 0.75);
   box-shadow:         -1px 1px 10px rgba(50, 50, 50, 0.75);
@@ -379,27 +461,7 @@ body {
   background-image: url('/static/img/arrow_why_45_black.png');
 }
 
-.pointCard .pointTitle a {
-  color: #000;
-  font-size: 1.0625em;
-  line-height: 1.3125em;
-}
 
-.pointCard .stat {
-  color: #a9a9a9;
-  font-family: "nimbus-sans-condensed", sans-serif;
-  font-weight: bold;
-  font-size:1.25em;
-}
-
-.pointCard .linkStat {
-
-  height:18px;
-  min-height:0px;
-  display:block;
-  float:left;
-
-}
 
 #scoreAndVotingSection {
 
@@ -443,40 +505,6 @@ body {
   background-color: #D9534F;
 }
 
-
-.pointCard .counterColor {
-  background-color: #ffe6e7;
-}
-
-.pointCard .supportColor {
-  background-color: #e3fde5;
-}
-
-.pointCard .gauge {
-  position:relative;
-}
-
-.pointCard .gaugeText {
-  top:3px;
-  position: absolute;
-  font-size: 1.125em;
-  color: #a9a9a9;
-  .bodyFont();
-  font-weight:700;
-  text-transform:Uppercase;
-}
-
-.pointCard .gaugeCounter {
-  right: 3px;
-}
-
-.pointCard .gaugeSupporting {
-  left: 3px;
-}
-
-.pointCard .pointTitle a:hover, .pointSmall .smallTitle a:hover {
-  text-decoration:none;
-}
 
 .pointSmall {
   background-color: #f8f8f8;
@@ -546,17 +574,6 @@ body {
   color:#EBC821;
 }
 
-
-.boxedElement {   // reusable mixin
-  border: 1px solid #ccc;
-  border-radius: 2px;
-  word-wrap: break-word;
-
-  h5 {
-    padding-left: 5px;
-  }
-}
-
 .pointSummaryText {
   padding-left: 5px;
 }
@@ -565,37 +582,38 @@ body {
   font-weight:bold;
   font-size:1.25em;
   color:#5b5b5b;
-  font-family:"nimbus-sans-condensed",sans-serif;
+  .condHeaderFont();
+
+  button {
+    display: inline;
+    color: #B9BBBD;
+    border: 0px;
+    background-color: transparent;
+    background-repeat: no-repeat;
+    background-position: 95% 0%;
+    font-style:normal;
+    font-size:20px;
+    //font-weight:bold;
+
+    &:hover {
+      background-color: #00ADEE;
+      color: white;
+      background-position: 95% 100%;
+    }
+  }
+
+  .selectedTab {
+    color:#5b5b5b;
+  }
+
+  .tab {
+    //padding-left: 0;
+    //padding-right: .5em;
+    padding: 3px;
+  }
 }
 
-.columnHeading button {
-  display: inline;
-  color: #B9BBBD;
-  border: 0px;
-  background-color: transparent;
-  background-repeat: no-repeat;
-  background-position: 95% 0%;
-  font-style:normal;
-  font-size:20px;
-  font-weight:bold;
-}
 
-.columnHeading .selectedTab {
-  color:#5b5b5b;
-}
-
-.columnHeading .tab {
-  padding-left: 0;
-  padding-right: .5em;
-}
-
-
-
-.columnHeading button:hover {
-  background-color: #00ADEE;
-  color: white;
-  background-position: 95% 100%;
-}
 
 #voteLabel {
   margin-top: 1em;
@@ -727,16 +745,24 @@ body {
 }
 
 .prosCons {
+  text-transform: uppercase;
+  font-size: 1.1em;
   padding-top:10px;
+  margin-top: 1em;
+  margin-bottom: 0.7em;
 }
 
 #supporting_nonzeroPoints, #counter_nonzeroPoints, #child_nonzeroPoints  {
   margin-bottom: 5%;
 }
 
-#supporting_numberOfPoints, #counter_numberOfPoints, #child_numberOfPoints {
+#supporting_numberOfPoints, #child_numberOfPoints {
   margin-top: 1em;
   margin-bottom: 1em;
+}
+#counter_numberOfPoints {
+  margin-top: 0.5em;
+  margin-bottom: 0.5em;
 }
 
 #supporting_zeroPoints, #counter_zeroPoints, #child_zeroPoints {
@@ -883,13 +909,13 @@ img.smallDisplay {
 
 .mainPointButton {
   display: inline;
-  color: #B9BBBD;
+  //color: #B9BBBD;
+  color: #aaa;
   border: 0px;
   background-color: transparent;
   background-repeat: no-repeat;
   background-position: 95% 0%;
   .headerFont();
-  font-weight:700;
   font-size:0.875em;
 }
 

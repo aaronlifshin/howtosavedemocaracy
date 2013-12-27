@@ -1,89 +1,90 @@
-   <div class="row-fluid">
-        <div class="span2 offset5 pagination-centered prosCons">
-        {% if linkType == 'supporting'%}
-            PROS
-          {% else %}
-            {% if linkType == 'counter' %}
-              CONS                     
+
+    <!-- PROS or CONS (header) -->
+    <div class="row-fluid">
+        <div class="span12 pagination-centered prosCons">
+            {% if linkedPoints %}
+            {% if linkType == 'child' %}
+            {{ linkedPoints|length }} Related {{nodetype}}{% if linkedPoints|length > 1 %}s{% endif %}
+            {% else %}
+            {{ linkedPoints|length }} {{linkType|title}} Point{% if linkedPoints|length > 1 %}s{% endif %}
             {% endif %}
-        {% endif %}
+            {% else %}
+            {% if linkType == 'child' %}
+            0 Related {{nodetype}}s
+            {% else %}
+            0 {{linkType|title}} Points
+            {% endif %}
+            {% endif %}
         </div>
    </div>
-  
-     <div class="row-fluid boxedElement span12 {% if linkedPoints %} {% else %} hide {% endif %}" id="{{linkType}}_nonzeroPoints">
-        <div id="{{linkType}}_numberOfPoints" class="row columnHeading pagination-centered">
-          {% if linkedPoints %}
-            {% if linkType == 'child' %}
-              {{ linkedPoints|length }} Related {{nodetype}}{% if linkedPoints|length > 1 %}s{% endif %}
-            
-            {% else %}            
-              {{ linkedPoints|length }} {{linkType|title}} Point{% if linkedPoints|length > 1 %}s{% endif %}
-            {% endif %}
-            
-          {% else %}
-            {% if linkType == 'child' %}
-              0 Related {{nodetype}}s
-            {% else %}
-              0 {{linkType|title}} Points
-            {% endif %}
-          {% endif %}
+
+   <!-- full column, including header & points -->
+   <div class="row-fluid span12 {% if linkedPoints %} {% else %} hide {% endif %}" id="{{linkType}}_nonzeroPoints">
+
+        <!-- header box -->
+        <div class="row-fluid pointyHeader">
+
+               <!-- buttons in header (add/unlink) -->
+               <div id="{{linkType}}_pointList" >
+                  <div id="{{linkType}}_menuArea"  class="row-fluid">
+                    <button id="{{linkType}}_unlinkToggle" class="mainPointButton pull-right"
+                         {% if nodetype %}data-nodetype="{{nodetype}}"{% endif %}
+                         type="submit">Unlink</button>
+                    <div class="dropdown">
+                      <button id="{{linkType}}_addPointWhenNonZero" name="{{linkType}}_addPointWhenNonZero"
+                          data-toggle="dropdown"
+                          class="mainPointButton pull-left  dropdown-toggle">
+                            {% if linkType == 'child' %}
+                              Add Related {{nodetype}}
+                            {% else %}
+                              Add {{linkType|title}} point
+                            {% endif %}
+                      </button>
+                      <ul class="dropdown-menu" role="menu" aria-labelledby="{{linkType}}_addPointWhenNonZero">
+                        <li><a tabindex="-1" aria-labelledby="{{linkType}}_addPointWhenNonZero" href="#"
+                          name="createLinked"
+                          data-linktype="{{linkType}}"
+                          {% if nodetype %}data-nodetype="{{nodetype}}"{% endif %}
+                          alt="Make a New {{linkType}} Point"
+                          >Add a new {{nodetype}}</a></li>
+                        <li><a tabindex="-1" aria-labelledby="{{linkType}}_addPointWhenNonZero" href="#"
+                        name="{{linkType}}_searchForPoint" alt="Search for a {{linkType|title}} Point"
+                        data-linktype="{{linkType}}"
+                        {% if nodetype %}data-nodetype="{{nodetype}}"{% endif %}
+                        >Search for an existing {{nodetype}}</a></li>
+                        {% if recentlyViewedPoints %}
+                          <li class="dropdown-submenu"><a tabindex="-1" href="#">Use a Recently viewed {{nodetype}}</a>
+                            <ul class="dropdown-menu">
+                              {% for RVpoint in recentlyViewedPoints %}
+                                  <li><a tabindex="-1" aria-labelledby="add{{linkType}}PointWhenNonZero"
+                                  name="selectPoint_menu_{{RVpoint.url}}"
+                                  alt="Use {{ RVpoint.title|escape }}"
+                                  data-pointurl="{{RVpoint.url}}"
+                                  data-linktype="{{linkType}}"
+                                  {% if nodetype %}data-nodetype="{{nodetype}}"{% endif %}
+                                  href="#">{{RVpoint.title|escape}}</a></li>
+                              {% endfor %}
+                            </ul>
+                          </li>
+                        {% else %}
+                          <li class="dropdown-submenu disabled"><a tabindex="-1" href="#">Use a Recently viewed {{nodetype}}</a>
+                        {% endif %}
+                      </ul>
+                    </div>
+                  </div>
+               </div>
         </div>
+
+        <!-- container around all points -->
         <div class="row-fluid">
-           <div class="span12" id="{{linkType}}_pointList">
-              <div id="{{linkType}}_menuArea"  class="row-fluid">
-                 <button id="{{linkType}}_unlinkToggle" class="mainPointButton pull-right" 
-                 {% if nodetype %}data-nodetype="{{nodetype}}"{% endif %}                 
-                 type="submit">Unlink</button>
-                <div class="dropdown pull-right">
-                  <button id="{{linkType}}_addPointWhenNonZero" name="{{linkType}}_addPointWhenNonZero"
-                  data-toggle="dropdown"
-                  class="mainPointButton pull-right dropdown-toggle">
-                    {% if linkType == 'child' %}
-                      Add Related {{nodetype}}
-                    {% else %}
-                      Add {{linkType|title}} point
-                    {% endif %}                    
-                  </button>
-                  <ul class="dropdown-menu" role="menu" aria-labelledby="{{linkType}}_addPointWhenNonZero">
-                    <li><a tabindex="-1" aria-labelledby="{{linkType}}_addPointWhenNonZero" href="#"
-                      name="createLinked" 
-                      data-linktype="{{linkType}}"
-                      {% if nodetype %}data-nodetype="{{nodetype}}"{% endif %}
-                      alt="Make a New {{linkType}} Point"
-                      >Add a new {{nodetype}}</a></li>
-                    <li><a tabindex="-1" aria-labelledby="{{linkType}}_addPointWhenNonZero" href="#"
-                    name="{{linkType}}_searchForPoint" alt="Search for a {{linkType|title}} Point"
-                    data-linktype="{{linkType}}"
-                    {% if nodetype %}data-nodetype="{{nodetype}}"{% endif %}                                        
-                    >Search for an existing {{nodetype}}</a></li>
-                    {% if recentlyViewedPoints %}
-                      <li class="dropdown-submenu"><a tabindex="-1" href="#">Use a Recently viewed {{nodetype}}</a>
-                        <ul class="dropdown-menu">
-                          {% for RVpoint in recentlyViewedPoints %}
-                              <li><a tabindex="-1" aria-labelledby="add{{linkType}}PointWhenNonZero" 
-                              name="selectPoint_menu_{{RVpoint.url}}" 
-                              alt="Use {{ RVpoint.title|escape }}" 
-                              data-pointurl="{{RVpoint.url}}"
-                              data-linktype="{{linkType}}"
-                              {% if nodetype %}data-nodetype="{{nodetype}}"{% endif %}                                                                      
-                              href="#">{{RVpoint.title|escape}}</a></li>                                        
-                          {% endfor %}
-                        </ul>
-                      </li>
-                    {% else %}
-                      <li class="dropdown-submenu disabled"><a tabindex="-1" href="#">Use a Recently viewed {{nodetype}}</a>                              
-                    {% endif %}                              
-                  </ul>
-                </div>
-              </div>
-              {% if linkedPoints %}            
-                {% for point in linkedPoints %}
-                    {% include 'pointBox.html' %}            
-                {% endfor %}
-              {% endif %}          
-          </div>
+           {% if linkedPoints %}
+             {% for point in linkedPoints %}
+                {% include 'pointBox.html' %}
+             {% endfor %}
+           {% endif %}
         </div>
-     </div>
+   </div>
+            
    <div id="{{linkType}}_zeroPoints" class="{% if linkedPoints %}row hide{%else%}row{% endif %}">
     <div class="boxedElement pagination-centered">
      <div id="{{linkType}}_zeroPointsText" class="row"> 
